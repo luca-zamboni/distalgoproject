@@ -7,12 +7,13 @@
 package projcyclon;
 
 import akka.*;
+import akka.actor.UntypedActor;
 
 /**
  *
  * @author luca
  */
-public class ProjCyclon {
+public class ProjCyclon extends UntypedActor {
 
     /**
      * @param args the command line arguments
@@ -20,6 +21,12 @@ public class ProjCyclon {
     public static void main(String[] args) {
         // TODO code application logic here
         System.out.println("yyyyy");
+        
+    }
+
+    @Override
+    public void onReceive(Object o) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
