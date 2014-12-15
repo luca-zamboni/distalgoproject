@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package distcyclon;
+package cyclon;
 
 /**
  *
- * @author luca
+ * @author Liuga
  */
-public class DistCyclon {
+public class Cyclon {
 
     /**
      * @param args the command line arguments
