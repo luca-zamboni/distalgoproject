@@ -13,12 +13,10 @@ import akka.actor.ActorRef;
  * @author luca
  */
 public class IActorRef{
-    private int index;
     private long timestamp;
     private ActorRef actor;
 
-    public IActorRef(int index, long timestamp, ActorRef actor) {
-        this.index = index;
+    public IActorRef( long timestamp, ActorRef actor) {
         this.timestamp = timestamp;
         this.actor = actor;
     }
@@ -37,14 +35,6 @@ public class IActorRef{
 
     public void setActor(ActorRef actor) {
         this.actor = actor;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
     
     

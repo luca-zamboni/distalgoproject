@@ -18,9 +18,9 @@ public class MessagePeer implements Serializable{
     
     public final int type;
     public final ActorRef sender;
-    public final ArrayList<ActorRef> peer;
+    public final ArrayList<IActorRef> peer;
 
-    public MessagePeer(int type, ActorRef sender, ArrayList<ActorRef> peer) {
+    public MessagePeer(int type, ActorRef sender, ArrayList<IActorRef> peer) {
         this.type = type;
         this.sender = sender;
         this.peer = peer;
