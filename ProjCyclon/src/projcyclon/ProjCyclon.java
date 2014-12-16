@@ -23,6 +23,7 @@ import scala.Serializable;
 public class ProjCyclon {
     
     public static ActorSystem system;
+    public static ActorRef tracker;
 
     public static void main(String[] args) {
         
@@ -37,17 +38,17 @@ public class ProjCyclon {
         } catch (Exception e) {
             NPeer = 4;
         }*/
-
-        NPeer = 4;
+        NPeer = 1;
+        
+        ProjCyclon.tracker = system.actorOf(Props.create(Tracker.class), "Tracker");
         
         ArrayList<IActorRef> peer = new ArrayList<>();
         
         for (int i = 0; i < NPeer; i++) {
-            peer.add(new IActorRef(1,system.actorOf(Props.create(Peer.class), "Peer_" + i)));
+            long time = System.currentTimeMillis();
+            peer.add(new IActorRef(i,time,system.actorOf(Props.create(Peer.class), "Peer_" + i)));
             System.out.println("Creazione di Peer_" + i);
         }
-
-        
 
     }
 

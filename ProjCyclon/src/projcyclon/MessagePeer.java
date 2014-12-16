@@ -14,16 +14,18 @@ import scala.Serializable;
  *
  * @author luca
  */
-public class Message implements Serializable {
-
-    public final String mess;
-    public final ActorRef sender;
-    public final int type;
-
-    public Message(int type, String mess, ActorRef sender) {
-        this.mess = mess;
-        this.sender = sender;
-        this.type = type;
-    }
+public class MessagePeer implements Serializable{
     
+    public final int type;
+    public final ActorRef sender;
+    public final ArrayList<ActorRef> peer;
+
+    public MessagePeer(int type, ActorRef sender, ArrayList<ActorRef> peer) {
+        this.type = type;
+        this.sender = sender;
+        this.peer = peer;
+    }
+
+    
+
 }
