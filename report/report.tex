@@ -1,0 +1,53 @@
+\documentclass[a4paper,12pt]{report} % Prepara un report per carta A4, con un font grande 12
+ 
+\usepackage[italian]{babel} % Adatta LaTeX alle convenzioni tipografiche italiane,
+% e ridefinisce alcuni titoli in italiano, come "Capitolo" al posto di "Chapter",
+\usepackage[T1]{fontenc} % Riga da togliere se si compila con PDFLaTeX
+\usepackage[utf8]{inputenc} % Consente l'uso caratteri accentati italiani
+\usepackage[superscript]{cite} % i numeri delle citazioni vengono messe in apice nel testo
+\usepackage{babelbib} %permette di aggiungere la entry "language" nel database bibliografico
+\usepackage[nottoc]{tocbibind} %aggiunge all'indice dei contenuti anche la bibliografia
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float} %per gestire la posizione delle immagini
+\usepackage{amsmath} %per le formule matematiche
+\usepackage{enumerate} %per liste enumerate
+\usepackage[noend,boxed]{algorithm2e}
+\usepackage{tabu}
+\usepackage[format=hang, indention=-2cm,labelfont=bf]{caption}
+\usepackage{changepage}
+%\usepackage{calligra}
+
+
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\numberwithin{equation}{chapter}
+
+\newenvironment{dedication}
+    {\vspace{6ex}\begin{quotation}\begin{flushright}\begin{em}}
+    {\par\end{em}\end{flushright}\end{quotation}}
+
+
+ 
+\frenchspacing % forza LaTeX ad una spaziatura uniforme, invece di lasciare più spazio
+% alla fine dei punti fermi come da convenzione inglese
+
+ 
+\author{Luca Erculiani}
+\date{20 Settembre 2014}
+% in alternativa a \date il comando \today introduce la data di sistema.
+ 
+\begin{document}
+
+
+
+
+%\maketitle % Produce il titolo a partire dai comandi \title, \author e \date 
+\pdfbookmark{\contentsname}{toc}
+\tableofcontents % Prepara l'indice generale
+\newpage
+
+
+
+
+\end{document}
