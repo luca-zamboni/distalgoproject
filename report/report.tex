@@ -1,51 +1,61 @@
-\documentclass[a4paper,12pt]{report} % Prepara un report per carta A4, con un font grande 12
+
+\documentclass[a4paper,12pt,notitlepage]{article} % Prepara un report per carta A4, con un font grande 12
  
-\usepackage[italian]{babel} % Adatta LaTeX alle convenzioni tipografiche italiane,
-% e ridefinisce alcuni titoli in italiano, come "Capitolo" al posto di "Chapter",
-\usepackage[T1]{fontenc} % Riga da togliere se si compila con PDFLaTeX
-\usepackage[utf8]{inputenc} % Consente l'uso caratteri accentati italiani
+\usepackage[english]{babel} % Adatta LaTeX alle convenzioni tipografiche italiane,
+%\usepackage[T1]{fontenc} % Riga da togliere se si compila con PDFLaTeX
+%\usepackage[utf8]{inputenc} % Consente l'uso caratteri accentati italiani
+\usepackage[a4paper,top=3cm,bottom=3cm,left=2.0cm,right=2.0cm]{geometry}
 \usepackage[superscript]{cite} % i numeri delle citazioni vengono messe in apice nel testo
 \usepackage{babelbib} %permette di aggiungere la entry "language" nel database bibliografico
 \usepackage[nottoc]{tocbibind} %aggiunge all'indice dei contenuti anche la bibliografia
-\usepackage{url}
-\usepackage{hyperref}
-\usepackage{graphicx}
+\usepackage{url} % aggiunge url
+\usepackage{hyperref} % aggiunge hyperref nel pdf
+\usepackage{graphicx} %non mi ricordo
 \usepackage{float} %per gestire la posizione delle immagini
 \usepackage{amsmath} %per le formule matematiche
 \usepackage{enumerate} %per liste enumerate
-\usepackage[noend,boxed]{algorithm2e}
-\usepackage{tabu}
-\usepackage[format=hang, indention=-2cm,labelfont=bf]{caption}
-\usepackage{changepage}
+\usepackage[noend,boxed]{algorithm2e} % per gli algoritmi
+\usepackage{tabu} %non me lo ricordo
+\usepackage[format=hang, indention=-2cm,labelfont=bf]{caption} 
+\usepackage{changepage} % sposta tabelle
 %\usepackage{calligra}
-
-
-\renewcommand{\theequation}{\thesection.\arabic{equation}}
-\numberwithin{equation}{chapter}
-
-\newenvironment{dedication}
-    {\vspace{6ex}\begin{quotation}\begin{flushright}\begin{em}}
-    {\par\end{em}\end{flushright}\end{quotation}}
-
-
+\usepackage{fontspec}
+\setmainfont{Calibri}
  
 \frenchspacing % forza LaTeX ad una spaziatura uniforme, invece di lasciare più spazio
 % alla fine dei punti fermi come da convenzione inglese
 
- 
-\author{Luca Erculiani}
-\date{20 Settembre 2014}
-% in alternativa a \date il comando \today introduce la data di sistema.
- 
+  
 \begin{document}
 
+\input{titlepage}
+\begin{abstract}
+   	 	
+    The topic of this work is the implementation of Cyclon, a decentralized
+    peer-to-peer protocol for gossiping over the Akka framework [URL AKKA REF].
+    The goal of Cyclon is to build a network that can resist against crash of 
+    a great part of its node without  collapsing in a series of disconnected clusters.
+    This document will explain first the theoretical basis of the protocol, then 
+    our implementation of it. The last part of this work will be focused on the statistical
+    result of this project.
+  
 
-
-
-%\maketitle % Produce il titolo a partire dai comandi \title, \author e \date 
-\pdfbookmark{\contentsname}{toc}
-\tableofcontents % Prepara l'indice generale
+\end{abstract}
 \newpage
+
+
+% \pdfbookmark{\contentsname}{toc}
+% \tableofcontents % Prepara l'indice generale
+% \newpage
+
+\section{INTRODUCTION}
+
+The goal of this work is to implement a simulation of a peer-to-peer network running
+ the Cyclon gossiping's protocol, for the project of Distributed Algorithms, by Alberto Montresor. 
+ The network is strongly decentralized and consist in a 
+ large number of peer clients and one or more tracker server, whose function is to allow new 
+ peers to connect into the network. Now will follow a list of fast description of the topics of every
+ section of this document.
 
 
 
