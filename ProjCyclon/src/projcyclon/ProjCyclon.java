@@ -33,7 +33,7 @@ public class ProjCyclon {
         } catch (Exception e) {
             NPeer = 4;
         }*/
-        NPeer = 10;
+        NPeer = 5;
         
         ProjCyclon.tracker = system.actorOf(Props.create(Tracker.class), "Tracker");
         
@@ -44,6 +44,7 @@ public class ProjCyclon {
             peer.add(new IActorRef(time,system.actorOf(Props.create(Peer.class), "Peer_" + i)));
             //System.out.println("Creazione di Peer_" + i);
         }
+        
         
         new ThreadMonitor().start();
 

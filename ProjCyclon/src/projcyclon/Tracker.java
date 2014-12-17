@@ -26,7 +26,7 @@ public class Tracker extends UntypedActor{
     public void preStart() throws Exception {
         super.preStart();
         peer = new ArrayList<>();
-        peer.add(new IActorRef(System.currentTimeMillis(),this.getSelf()));
+        //peer.add(new IActorRef(System.currentTimeMillis(),this.getSelf()));
     }
 
     @Override
@@ -50,6 +50,7 @@ public class Tracker extends UntypedActor{
                 break;
             }
         }
+        
     }
     
     private ArrayList<IActorRef> getPeerForReply(ActorRef sender){
@@ -58,7 +59,7 @@ public class Tracker extends UntypedActor{
             if(!peer.get(i).getActor().equals(sender))
                 ret.add(peer.get(i));
         }
-        System.err.println(ret.size());
+        //System.err.println(ret.size());
         return ret;
     }
     

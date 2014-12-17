@@ -7,12 +7,13 @@
 package projcyclon;
 
 import akka.actor.ActorRef;
+import java.util.Comparator;
 
 /**
  *
  * @author luca
  */
-public class IActorRef{
+public class IActorRef implements Comparator<IActorRef>{
     private long timestamp;
     private ActorRef actor;
 
@@ -36,6 +37,22 @@ public class IActorRef{
     public void setActor(ActorRef actor) {
         this.actor = actor;
     }
+
+    @Override
+    public int compare(IActorRef o1, IActorRef o2) {
+        if(o1.timestamp > o2.timestamp)
+            return 1;
+        else
+            return -1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        IActorRef a = (IActorRef) obj;
+        return this.actor.equals(a.actor);
+    }
+    
+    
     
     
     
