@@ -4,7 +4,7 @@ package monitoringutils;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import projcyclon.IActorRef;
+import projcyclon.MyActor;
 import projcyclon.Peer;
 
 /**
@@ -14,22 +14,29 @@ import projcyclon.Peer;
 public class ThreadMonitor extends Thread{
 
     @Override
-    public void run() {
-        while(true){
+    public void run() {          
+        try {
+            sleep(500);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ThreadMonitor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        while(true){      
+
             try {
                 sleep(500);
-            } catch (InterruptedException ex) {
+            
+                String tot = "";
+            for(Peer p:Registro.reg){
+                String g=p.getSelf().path().name() + " - " + p.neighbors.size() + " -";
+                for(MyActor a:p.neighbors)
+                    g += " " + a.getActor();
+                tot+=g + "\n";
+            }
+                System.out.println(tot + "\n");
+            
+            } catch (Exception ex) {
                 Logger.getLogger(ThreadMonitor.class.getName()).log(Level.SEVERE, null, ex);
             }
-            for(Peer p:Registro.reg){
-                String g=" ";
-                for(IActorRef a:p.neighbors)
-                    g += " " + a.getActor().path().name();
-                System.out.println(p.neighbors.size() + g);
-            }
-            System.out.println("");
-            
-            
         }
     }
     

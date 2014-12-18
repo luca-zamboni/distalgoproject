@@ -10,6 +10,7 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import java.util.ArrayList;
+import java.util.Collections;
 import static projcyclon.ProjCyclon.system;
 
 /**
@@ -20,30 +21,31 @@ public class Tracker extends UntypedActor{
     
     public static final int DEF_PEER_NUM = 5;
     
-    ArrayList<IActorRef> peer;
+    ArrayList<MyActor> peer;
+    
+    int myKey = -1;
 
     @Override
     public void preStart() throws Exception {
         super.preStart();
         peer = new ArrayList<>();
-        //peer.add(new IActorRef(System.currentTimeMillis(),this.getSelf()));
     }
 
     @Override
     public void onReceive(Object message) throws Exception {
+        System.err.println("kaskdk");
         if (message instanceof Message) {
             
             Message m = (Message) message;
             
-            if(!peer.contains(m.sender)){
-                peer.add(new IActorRef(System.currentTimeMillis(), m.sender));
+            if(!peer.contains(new MyActor(0,m.sender))){
+                peer.add(new MyActor(System.currentTimeMillis(), m.sender));
             }
             
             switch (m.type) {
                 case 0:
-                    //System.err.println(m.sender.path().name());
-                    ArrayList<IActorRef> peerReply = getPeerForReply(m.sender);
-                    m.sender.tell(new MessagePeer(1, this.getSelf(), peerReply), null);
+                    ArrayList<MyActor> peerReply = getPeerForReply(m.sender);
+                    getPointer(m.sender).tell(new MessagePeer(2, -1 , peerReply), null);
                 break;
                 default:
                     System.err.println("Error reading message");
@@ -53,14 +55,22 @@ public class Tracker extends UntypedActor{
         
     }
     
-    private ArrayList<IActorRef> getPeerForReply(ActorRef sender){
-        ArrayList<IActorRef> ret = new ArrayList<>();
+    
+    private ArrayList<MyActor> getPeerForReply(int sender){
+        ArrayList<MyActor> ret = new ArrayList<>();
+        Collections.sort(peer, new MyActor(0,-1));
         for(int i = 0; i<DEF_PEER_NUM && i < peer.size(); i++) {
-            if(!peer.get(i).getActor().equals(sender))
+            if(!peer.get(i).equals(new MyActor(i, sender))){
                 ret.add(peer.get(i));
+            }else if(peer.size()!=1){
+                i-=1;
+            }
         }
-        //System.err.println(ret.size());
         return ret;
+    }
+    
+    private ActorRef getPointer(int point){
+        return ProjCyclon.peer.get(point);
     }
     
 }
