@@ -16,9 +16,9 @@ import java.util.Objects;
  */
 public class MyActor implements Comparator<MyActor>{
     private long timestamp;
-    private int  actor;
+    private String  actor;
 
-    public MyActor( long timestamp, int actor) {
+    public MyActor( long timestamp, String actor) {
         this.timestamp = timestamp;
         this.actor = actor;
     }
@@ -31,11 +31,11 @@ public class MyActor implements Comparator<MyActor>{
         this.timestamp = timestamp;
     }
 
-    public int getActor() {
+    public String getActor() {
         return actor;
     }
 
-    public void setActor(int actor) {
+    public void setActor(String actor) {
         this.actor = actor;
     }
 

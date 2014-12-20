@@ -17,10 +17,10 @@ import scala.Serializable;
 public class MessagePeer implements Serializable{
     
     public final int type;
-    public final int sender;
+    public final String sender;
     public final ArrayList<MyActor> peer;
 
-    public MessagePeer(int type, int sender, ArrayList<MyActor> peer) {
+    public MessagePeer(int type, String sender, ArrayList<MyActor> peer) {
         this.type = type;
         this.sender = sender;
         this.peer = peer;

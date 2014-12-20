@@ -16,10 +16,10 @@ import scala.Serializable;
  */
 public class Message implements Serializable {
 
-    public final int sender;
+    public final String sender;
     public final int type;
 
-    public Message(int type, int sender) {
+    public Message(int type, String sender) {
         this.sender = sender;
         this.type = type;
     }

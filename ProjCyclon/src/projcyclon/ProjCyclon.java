@@ -18,10 +18,10 @@ import monitoringutils.ThreadMonitor;
  */
 public class ProjCyclon {
     
+    public static final String TRACKER_NAME = "Tracker";
+    
     public static ActorSystem system;
     public static ActorRef tracker;
-    
-    public static HashMap<Integer,ActorRef> peer;
 
     public static void main(String[] args) {
         
@@ -37,21 +37,19 @@ public class ProjCyclon {
             NPeer = 4;
         }*/
         
-        NPeer = 5;
+        NPeer = 4;
         
-        ProjCyclon.tracker = system.actorOf(Props.create(Tracker.class), "Tracker");
-        
-        peer = new HashMap<>();
+        ProjCyclon.tracker = system.actorOf(Props.create(Tracker.class), TRACKER_NAME);
         
         for (int i = 0; i < NPeer; i++) {
-            long time = System.currentTimeMillis();
-            peer.put(i, system.actorOf(Props.create(Peer.class), "Peer_" + i));
+            //long time = System.currentTimeMillis();
+            system.actorOf(Props.create(Peer.class), "Peer_" + i);
         }
-        
-        
         //int j = JOptionPane.showConfirmDialog(null, "Start monitoring?");
         new ThreadMonitor().start();
 
     }
+    
+    
 
 }

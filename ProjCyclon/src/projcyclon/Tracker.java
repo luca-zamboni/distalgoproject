@@ -7,6 +7,7 @@
 package projcyclon;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ public class Tracker extends UntypedActor{
 
     @Override
     public void onReceive(Object message) throws Exception {
-        System.err.println("kaskdk");
         if (message instanceof Message) {
             
             Message m = (Message) message;
@@ -41,11 +41,10 @@ public class Tracker extends UntypedActor{
             if(!peer.contains(new MyActor(0,m.sender))){
                 peer.add(new MyActor(System.currentTimeMillis(), m.sender));
             }
-            
             switch (m.type) {
                 case 0:
                     ArrayList<MyActor> peerReply = getPeerForReply(m.sender);
-                    getPointer(m.sender).tell(new MessagePeer(2, -1 , peerReply), null);
+                    getPointer(m.sender).tell(new MessagePeer(2, name() , peerReply), null);
                 break;
                 default:
                     System.err.println("Error reading message");
@@ -56,21 +55,24 @@ public class Tracker extends UntypedActor{
     }
     
     
-    private ArrayList<MyActor> getPeerForReply(int sender){
+    private ArrayList<MyActor> getPeerForReply(String sender){
         ArrayList<MyActor> ret = new ArrayList<>();
-        Collections.sort(peer, new MyActor(0,-1));
+        Collections.sort(peer, new MyActor(0,""));
         for(int i = 0; i<DEF_PEER_NUM && i < peer.size(); i++) {
             if(!peer.get(i).equals(new MyActor(i, sender))){
                 ret.add(peer.get(i));
-            }else if(peer.size()!=1){
-                i-=1;
             }
         }
         return ret;
     }
     
-    private ActorRef getPointer(int point){
-        return ProjCyclon.peer.get(point);
+    private ActorSelection getPointer(String name){
+        ActorSelection point = ProjCyclon.system.actorSelection("/user/"+name);
+        return point;
+    }
+    
+    private String name(){
+        return this.getSelf().path().name();
     }
     
 }
