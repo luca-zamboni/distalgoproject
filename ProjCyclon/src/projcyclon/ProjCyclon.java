@@ -37,7 +37,7 @@ public class ProjCyclon {
             NPeer = 4;
         }*/
         
-        NPeer = 4;
+        NPeer = 1000;
         
         ProjCyclon.tracker = system.actorOf(Props.create(Tracker.class), TRACKER_NAME);
         

@@ -2,12 +2,14 @@ package projcyclon;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
+import akka.actor.Cancellable;
 import akka.actor.UntypedActor;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import monitoringutils.Registro;
@@ -19,14 +21,18 @@ import scala.concurrent.duration.Duration;
  */
 public class Peer extends UntypedActor implements Runnable {
 
-    public static int delta = 2000;
-    public static int DEF_PEER_NUM = 5;
+    public static final int delta = 200;
+    public static final int DEF_PEER_NUM = 5;
 
     public boolean active = true;
 
-    public ArrayList<MyActor> neighbors = new ArrayList<>();
+    public List<MyActor> neighbors =  Collections.synchronizedList(new ArrayList());
 
     public ActorRef tracker;
+    
+    private Cancellable updater;
+    
+    public int cycle = 0;
 
     @Override
     public void preStart() throws Exception {
@@ -39,12 +45,7 @@ public class Peer extends UntypedActor implements Runnable {
 
         getInitialPeerFromTracker();
 
-        /*ProjCyclon.system.scheduler().schedule(
-                Duration.create(0, TimeUnit.MILLISECONDS),
-                Duration.create(delta, TimeUnit.MILLISECONDS),
-                this,
-                ProjCyclon.system.dispatcher()
-        );/**/
+        /*/**/
         /*ProjCyclon.system.scheduler().scheduleOnce(
          Duration.create(1000, TimeUnit.MILLISECONDS),
          this,
@@ -71,7 +72,7 @@ public class Peer extends UntypedActor implements Runnable {
         }
     }
 
-    private void addNewNeighbor(int type, String sender, ArrayList<MyActor> peer) {
+    private final void addNewNeighbor(int type, String sender, ArrayList<MyActor> peer) {
         long now = System.currentTimeMillis();
         for(MyActor a:peer){
             if(!neighbors.contains(a)){
@@ -81,6 +82,8 @@ public class Peer extends UntypedActor implements Runnable {
         if(type==1){
             neighbors.remove(new MyActor(0, sender));
             neighbors.add(new MyActor(now, sender));
+        }else{
+            neighbors.remove(new MyActor(0, sender));
         }
         neighbors.remove(new MyActor(now, name()));
         
@@ -93,14 +96,17 @@ public class Peer extends UntypedActor implements Runnable {
         getPointer(to.getActor()).tell(new MessagePeer(type, name(), peerReply), null);
     }
     
-    private ArrayList<MyActor> getPeerForReply(String actor) {
+    private final ArrayList<MyActor> getPeerForReply(String actor) {
+        int numToChange = neighbors.size()/2;
         ArrayList<MyActor> ret = new ArrayList<>();
-        Collections.sort(neighbors, new MyActor(0,""));
-        for(int i = 0; i<DEF_PEER_NUM && i < neighbors.size(); i++) {
-            if(!neighbors.get(i).equals(new MyActor(i, actor))){
-                ret.add(neighbors.get(i));
+        try{
+            Collections.sort(neighbors, new MyActor(0,""));
+            for(int i = 0; i<numToChange && i < neighbors.size(); i++) {
+                if(!neighbors.get(i).equals(new MyActor(i, actor))){
+                    ret.add(neighbors.get(i));
+                }
             }
-        }
+        }catch(Exception e){}
         return ret;
     }
 
@@ -120,10 +126,11 @@ public class Peer extends UntypedActor implements Runnable {
     @Override
     public void run() {
         try {
+            cycle++;
             send(1, selectPeerToContact());
 
         } catch (Exception e) {
-            System.err.println("No peer to contact");
+            //System.err.println("No peer to contact");
         }
 
     }
@@ -136,6 +143,17 @@ public class Peer extends UntypedActor implements Runnable {
     private ActorSelection getPointer(String name){
         ActorSelection point = ProjCyclon.system.actorSelection("/user/"+name);
         return point;
+    }
+    public void startAutoUpdate(){
+        updater = ProjCyclon.system.scheduler().schedule(
+                Duration.create(0, TimeUnit.MILLISECONDS),
+                Duration.create(delta, TimeUnit.MILLISECONDS),
+                this,
+                ProjCyclon.system.dispatcher()
+        );
+    }
+    public void stopAutoUpdate(){
+        updater.cancel();
     }
 
 }

@@ -20,7 +20,7 @@ import static projcyclon.ProjCyclon.system;
  */
 public class Tracker extends UntypedActor{
     
-    public static final int DEF_PEER_NUM = 5;
+    public static final int DEF_PEER_NUM = 10;
     
     ArrayList<MyActor> peer;
     
