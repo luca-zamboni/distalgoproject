@@ -61,9 +61,8 @@ public class Peer extends UntypedActor implements Runnable {
             
             switch (m.type) {
                 case 1:
-                    
-                    send(2, new MyActor(0, m.sender));
                     addNewNeighbor(m.type, m.sender, m.peer);
+                    send(2, new MyActor(0, m.sender));
                     break;
                 case 2:
                     addNewNeighbor(m.type, m.sender, m.peer);
@@ -97,13 +96,13 @@ public class Peer extends UntypedActor implements Runnable {
     }
     
     private final ArrayList<MyActor> getPeerForReply(String actor) {
-        int numToChange = neighbors.size()/2;
+        int numToChange = neighbors.size()/2-1;
         ArrayList<MyActor> ret = new ArrayList<>();
         try{
             Collections.sort(neighbors, new MyActor(0,""));
             for(int i = 0; i<numToChange && i < neighbors.size(); i++) {
                 if(!neighbors.get(i).equals(new MyActor(i, actor))){
-                    ret.add(neighbors.get(i));
+                    ret.add(neighbors.remove(i));
                 }
             }
         }catch(Exception e){}

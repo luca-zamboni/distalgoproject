@@ -10,6 +10,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JOptionPane;
 import monitoringutils.ThreadMonitor;
 
 /**
@@ -30,14 +31,14 @@ public class ProjCyclon {
         int NPeer;
         
         // DECOMMENTARE QUANDO CONSEGNAMO
-        /*try {
+        try {
             String sNPeer = JOptionPane.showInputDialog("Quanti peer vuoi?");
             NPeer = Integer.parseInt(sNPeer);
         } catch (Exception e) {
             NPeer = 4;
-        }*/
+        }
         
-        NPeer = 1000;
+        //NPeer = 10;
         
         ProjCyclon.tracker = system.actorOf(Props.create(Tracker.class), TRACKER_NAME);
         
