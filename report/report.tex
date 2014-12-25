@@ -19,7 +19,7 @@
 \usepackage[format=hang, indention=-2cm,labelfont=bf]{caption} 
 \usepackage{changepage} % sposta tabelle
 %\usepackage{calligra}
-\usepackage{fontspec}
+\usepackage{fontspec} % permette di cambiare il font
 \setmainfont{Calibri}
  
 \frenchspacing % forza LaTeX ad una spaziatura uniforme, invece di lasciare più spazio
@@ -56,6 +56,90 @@ The goal of this work is to implement a simulation of a peer-to-peer network run
  large number of peer clients and one or more tracker server, whose function is to allow new 
  peers to connect into the network. Now will follow a list of fast description of the topics of every
  section of this document.
+
+
+
+\section{SYSTEM MODEL}
+
+The system that we want to model is a dinamic collection of distribuited nodes that wants to partecipate in
+ a epidemic protocol. The number of node isn't fixed and can increase or decrease depending on peers who
+ join and leave the protocol, or maybe crash. 
+ The communication between pairs of nodes needs that one 
+ of them knows the addres of the other one, and the channel is a best-effort type (potentially a lot of 
+ message omission). 
+
+
+\subsection{SERVICE SPECIFICATION}
+
+Nodes has only a partial views of the network, and this wiew is dinamic. Each node periodically 
+ gossip with a random neighbour about its other neighbour. The main idea is that nodes continuously
+ exchange information about other nodes, removing the old ones (so the most probable diaseppeared) and
+ adding the new ones. Each node has a fixed number of neigbhbour and shuffle this with other nodes.
+ For communicating with another node, a peer needs a neighbor descriptor of that node, consisting:
+
+ \begin{itemize}
+ 	\item the address of that node
+ 	\item a timestamp information about the age of the descriptor
+ 	\item more additional information, maybe needed by the upper software layer[CITAZIONE MONTRE]
+ \end{itemize}
+
+When a new node want to enter in the protocol asks to a tracker 
+ server a random subset of peers and start the communication.
+
+ \subsection{SKELETON OF THE ALGORITHM}	
+Here is presented the structure of the code of an instance running Cyclon. The first algorithm shown 
+ is common to a bunch of protocol with the same purpose, like Newscast[CITAZIONE].
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\SetKwProg{Upon}{upon}{ do}{end}
+\SetKwProg{UponRec}{upon receive}{ do}{end}
+\SetKwProg{Repeat}{repeat}{ }{end}
+\SetKw{Send}{send}
+\SetKw{To}{to}
+
+\Upon{inizialization}{
+	\(view \leftarrow\) descriptor(s) of nodes already in the system
+	}
+\BlankLine
+\Repeat{every \(\Delta\) time units}{
+	Process \(q \leftarrow\) selectNeighbor(\(view\))
+
+	\(m \leftarrow\) prepareRequest(\(view,q\))
+
+	\Send \(\langle\mbox{REQUEST},m,p\rangle\) \To{q}
+	}
+\BlankLine
+
+\UponRec{\(\langle\mbox{REQUEST},m,q\rangle\)}{
+	\(m \leftarrow\) prepareReplay(\(view,q\))
+
+	\Send \(\langle\mbox{REPLY},m',p\rangle\) \To{q}
+
+	\(view \leftarrow\) merge(\(view,m,q\))
+}
+\BlankLine
+
+\UponRec{\(\langle\mbox{REPLY},m,q\rangle\)}{
+	\(view \leftarrow\) merge(\(view,m,q\))
+
+}
+\BlankLine
+\end{algorithm}
+
+What make every protocol different is the behaviour of
+ the three functions called in the previous pseudocode. In Cyclon these components acts
+ in this way:
+
+\begin{itemize}
+	\item selectNeighbor() selects the oldest neighobr in the view
+	\item prepareRequest(\(view, q\)) removes \(t-1\) random descriptors from the view and return this 
+	subset plus a fresh local one
+	\item prepareReply(\(view, q\)) removes and return t freshest neighbors from the local view
+	\item merge(\(view, m, q\)) merges the local view and the one received, if there are duplicates keeps only the 
+	freshest. Remove itself and reinsert entries sent to \(q\) if space permits
+\end{itemize}
+
 
 
 
