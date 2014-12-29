@@ -35,7 +35,7 @@ public class ProjCyclon {
             String sNPeer = JOptionPane.showInputDialog("Quanti peer vuoi?");
             NPeer = Integer.parseInt(sNPeer);
         } catch (Exception e) {
-            NPeer = 4;
+            NPeer = 10;
         }
         
         //NPeer = 10;

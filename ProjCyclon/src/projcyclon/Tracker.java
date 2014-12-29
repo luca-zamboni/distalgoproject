@@ -20,7 +20,7 @@ import static projcyclon.ProjCyclon.system;
  */
 public class Tracker extends UntypedActor{
     
-    public static final int DEF_PEER_NUM = 10;
+    public static final int DEF_PEER_NUM = Peer.DEF_CONTAINED;
     
     ArrayList<MyActor> peer;
     
@@ -44,7 +44,7 @@ public class Tracker extends UntypedActor{
             switch (m.type) {
                 case 0:
                     ArrayList<MyActor> peerReply = getPeerForReply(m.sender);
-                    getPointer(m.sender).tell(new MessagePeer(2, name() , peerReply), null);
+                    getPointer(m.sender).tell(new MessagePeer(0, name() , peerReply), null);
                 break;
                 default:
                     System.err.println("Error reading message");

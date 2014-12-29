@@ -22,7 +22,7 @@ public class ThreadMonitor extends Thread {
     @Override
     public void run() {
         try {
-            sleep(5000);
+            sleep(2000);
         } catch (InterruptedException ex) {
             Logger.getLogger(ThreadMonitor.class.getName()).log(Level.SEVERE, null, ex);
         }
