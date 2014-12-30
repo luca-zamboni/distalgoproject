@@ -22,15 +22,15 @@ import scala.concurrent.duration.Duration;
 public class Peer extends UntypedActor implements Runnable {
 
     public static final int delta = 200;
-    public static final int DEF_PEER_NUM = 1;
+    public static final int DEF_PEER_NUM = 3;
     public static final int DEF_CONTAINED = 4;
 
     public boolean active = true;
 
-    public List<MyActor> neighbors = Collections.synchronizedList(new ArrayList());
+    public List<MyActor> neighbors = new ArrayList();
 
-    public List<MyActor> savedNeighbors = Collections.synchronizedList(new ArrayList());
-    public List<MyActor> savedNeighborsBis = Collections.synchronizedList(new ArrayList());
+    public List<MyActor> savedNeighbors = new ArrayList();
+    public List<MyActor> savedNeighborsBis = new ArrayList();
 
     public ActorRef tracker;
 
@@ -66,7 +66,9 @@ public class Peer extends UntypedActor implements Runnable {
 
             switch (m.type) {
                 case 0:
+                    System.err.println(name());
                     addNewNeighbor(m.type, m.sender, m.peer);
+                    break;
                 case 1:
                     send(2, new MyActor(0, m.sender));
                     addNewNeighbor(m.type, m.sender, m.peer);
@@ -74,41 +76,50 @@ public class Peer extends UntypedActor implements Runnable {
                 case 2:
                     if (m.sender.equals(toRecive.getActor())) {
                         addNewNeighbor(m.type, m.sender, m.peer);
-                        startAutoUpdate();
+                        //startAutoUpdate();
                     }
                     break;
             }
         }
     }
 
-    private synchronized void addNewNeighbor(int type, String sender, ArrayList<MyActor> peer) {
+    private void addNewNeighbor(int type, String sender, ArrayList<MyActor> peer) {
         //long now = System.currentTimeMillis();
+        
+        String b = neighbors.size() + " " + peer.size();
+        
         for (MyActor a : peer) {
-            if (!neighbors.contains(a)) {
+            if (!neighbors.contains(a) && neighbors.size() < DEF_CONTAINED ) {
                 neighbors.add(a);
             }
         }
-
+        System.err.println(name() + type + " " +b+" "+neighbors.size());
         if (type == 1) {
+            /*int n = DEF_CONTAINED - neighbors.size();
+            n = Math.min(n, savedNeighborsBis.size());
+            neighbors.addAll(savedNeighborsBis.subList(0, n));*/
             for (int i = 0;
                     type != 0 && neighbors.size() < DEF_CONTAINED && i < savedNeighborsBis.size();
                     i++) {
                 if (!neighbors.contains(savedNeighborsBis.get(i))) {
-                    neighbors.add(savedNeighborsBis.remove(i));
-                    if(neighbors.size()>DEF_CONTAINED){
-                        System.err.println(name()+" " +neighbors.size() );
-                    }
+                    neighbors.add(savedNeighborsBis.get(i));
                 }
             }
-        } /* else {
+            savedNeighborsBis.clear();
+        } else if(type == 2){
+            /*int n = DEF_CONTAINED - neighbors.size();
+            n = Math.min(n, savedNeighbors.size());
+            neighbors.addAll(savedNeighbors.subList(0, n));*/
             for (int i = 0;
                     type != 0 && neighbors.size() < DEF_CONTAINED && i < savedNeighbors.size();
                     i++) {
+                
                 if (!neighbors.contains(savedNeighbors.get(i))) {
-                    neighbors.add(savedNeighbors.remove(i));
+                    neighbors.add(savedNeighbors.get(i));
                 }
             }
-        }*/
+            savedNeighbors.clear();
+        }
 
     }
 
@@ -116,10 +127,8 @@ public class Peer extends UntypedActor implements Runnable {
         ArrayList<MyActor> peerReply;
         if (type == 1) {
             peerReply = getPeerRandom(to.getActor());
-            savedNeighbors.addAll(peerReply);
         } else {
             peerReply = getPeerForReply(to.getActor());
-            savedNeighborsBis.addAll(peerReply);
         }
 
         getPointer(to.getActor()).tell(new MessagePeer(type, name(), peerReply), null);
@@ -138,6 +147,8 @@ public class Peer extends UntypedActor implements Runnable {
             System.out.println("Errore " + name());
         }
         Long time = System.currentTimeMillis();
+        
+        savedNeighbors.addAll(ret);
         ret.add(new MyActor(time, name()));
         neighbors.remove(new MyActor(0, actor));
         return ret;
@@ -155,6 +166,7 @@ public class Peer extends UntypedActor implements Runnable {
         } catch (Exception e) {
             System.out.println("Errore " + name());
         }
+            savedNeighborsBis.addAll(ret);
         return ret;
     }
 
