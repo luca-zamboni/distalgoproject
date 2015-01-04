@@ -57,8 +57,8 @@ public class Tracker extends UntypedActor{
         ArrayList<MyActor> ret = new ArrayList<>();
         Collections.sort(peer, new MyActor(0,""));
         for(int i = 0; i<DEF_PEER_NUM && i < peer.size(); i++) {
-            if(!peer.get(i).equals(new MyActor(i, sender))){
-                ret.add(peer.get(i));
+            if(!peer.get(peer.size() - i -1).equals(new MyActor(i, sender))){
+                ret.add(peer.get(peer.size() - i -1));
             }
         }
         return ret;
