@@ -17,12 +17,12 @@ import scala.concurrent.duration.Duration;
 
 /**
  *
- * @author luca
+ * @author luca & luca
  */
 public class Peer extends UntypedActor implements Runnable {
 
-    public static final int delta = 200;
-    public static final int DEF_PEER_NUM = 5;
+    public static final int DELTA = 200;
+    public static final int DEF_PEER_NUM = 3;
     public static final int DEF_CONTAINED = 10;
 
     public boolean active = true;
@@ -63,28 +63,34 @@ public class Peer extends UntypedActor implements Runnable {
     public void onReceive(Object message) throws Exception {
         if (message instanceof MessagePeer) {
             MessagePeer m = (MessagePeer) message;
-
-            switch (m.type) {
-                case 0:
-                    System.err.println(name());
-                    addNewNeighbor(m.type, m.sender, m.peer);
-                    break;
-                case 1:
-                    send(2, new MyActor(0, m.sender));
-                    addNewNeighbor(m.type, m.sender, m.peer);
-                    break;
-                case 2:
-                    if (m.sender.equals(toRecive.getActor())) {
-                        addNewNeighbor(m.type, m.sender, m.peer);
-                        startAutoUpdate();
-                    }
-                    break;
+            if(active){
+                switch (m.type) {
+                    case MessagePeer.DIED:
+                        merge(m.type, m.sender, m.peer);
+                        removeNodeFromNeighbors(m.sender);
+                        //AutoUpdateNow();
+                        break;
+                    case 0:
+                        merge(m.type, m.sender, m.peer);
+                        break;
+                    case 1:
+                        send(2, new MyActor(0, m.sender));
+                        merge(m.type, m.sender, m.peer);
+                        break;
+                    case 2:
+                        if (m.sender.equals(toRecive.getActor())) {
+                            merge(m.type, m.sender, m.peer);
+                            //startAutoUpdate();
+                        }
+                        break;
+                }
+            }else{
+                send(MessagePeer.DIED, new MyActor(0, m.sender));
             }
         }
     }
 
-    private void addNewNeighbor(int type, String sender, ArrayList<MyActor> peer) {
-        //long now = System.currentTimeMillis();
+    private void merge(int type, String sender, ArrayList<MyActor> peer) {
         
         String b = neighbors.size() + " " + peer.size();
         
@@ -93,26 +99,17 @@ public class Peer extends UntypedActor implements Runnable {
                 neighbors.add(a);
             }
         }
-        System.err.println(name() + type + " " +b+" "+neighbors.size());
         if (type == 1) {
-            /*int n = DEF_CONTAINED - neighbors.size();
-            n = Math.min(n, savedNeighborsBis.size());
-            neighbors.addAll(savedNeighborsBis.subList(0, n));*/
             for (int i = 0;
-                    type != 0 && neighbors.size() < DEF_CONTAINED && i < savedNeighborsBis.size();
-                    i++) {
+                    type != 0 && neighbors.size() < DEF_CONTAINED && i < savedNeighborsBis.size(); i++) {
                 if (!neighbors.contains(savedNeighborsBis.get(i))) {
                     neighbors.add(savedNeighborsBis.get(i));
                 }
             }
             savedNeighborsBis.clear();
-        } else if(type == 2){
-            /*int n = DEF_CONTAINED - neighbors.size();
-            n = Math.min(n, savedNeighbors.size());
-            neighbors.addAll(savedNeighbors.subList(0, n));*/
+        } else if(type == 2 || type == MessagePeer.DIED){
             for (int i = 0;
-                    type != 0 && neighbors.size() < DEF_CONTAINED && i < savedNeighbors.size();
-                    i++) {
+                    type != 0 && neighbors.size() < DEF_CONTAINED && i < savedNeighbors.size(); i++) {
                 
                 if (!neighbors.contains(savedNeighbors.get(i))) {
                     neighbors.add(savedNeighbors.get(i));
@@ -124,11 +121,13 @@ public class Peer extends UntypedActor implements Runnable {
     }
 
     private void send(int type, MyActor to) {
-        ArrayList<MyActor> peerReply;
-        if (type == 1) {
-            peerReply = getPeerRandom(to.getActor());
-        } else {
-            peerReply = getPeerForReply(to.getActor());
+        ArrayList<MyActor> peerReply = new ArrayList<>();
+        if(active){
+            if (type == 1) {
+                peerReply = getPeerRandom(to.getActor());
+            } else {
+                peerReply = getPeerForReply(to.getActor());
+            }
         }
 
         getPointer(to.getActor()).tell(new MessagePeer(type, name(), peerReply), null);
@@ -164,7 +163,7 @@ public class Peer extends UntypedActor implements Runnable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Errore " + name());
+            System.out.println("Errore " + name() + " " + e.getMessage());
         }
             savedNeighborsBis.addAll(ret);
         return ret;
@@ -181,22 +180,26 @@ public class Peer extends UntypedActor implements Runnable {
         return neighbors.get(0);
 
     }
+    private void removeNodeFromNeighbors(String sender) {
+        neighbors.remove(new MyActor(0,sender));
+    }
 
     @Override
     public void run() {
         try {
-            while (neighbors.isEmpty()) {
+            while (neighbors.isEmpty() && active) {
 
                 //System.err.println(name() + " sono addormentato");
-                sleep(delta);
+                sleep(DELTA);
             }
 
-            cycle++;
-            toRecive = selectPeerToContact();
+            if(active){
+                cycle++;
+                toRecive = selectPeerToContact();
 
-            send(1, toRecive);
-            //System.err.println(name() + " send to " + toRecive);
-
+                send(1, toRecive);
+                //System.err.println(name() + " send to " + toRecive);
+            }
         } catch (Exception e) {
             //System.err.println("No peer to contact " + name());
         }
@@ -216,8 +219,14 @@ public class Peer extends UntypedActor implements Runnable {
     }
 
     public void startAutoUpdate() {
+        updater = ProjCyclon.system.scheduler().scheduleOnce(Duration.create(DELTA, TimeUnit.MILLISECONDS),
+                this,
+                ProjCyclon.system.dispatcher()
+        );
+    }
+    public void AutoUpdateNow() {
         updater = ProjCyclon.system.scheduler().scheduleOnce(
-                Duration.create(delta, TimeUnit.MILLISECONDS),
+                Duration.create(0, TimeUnit.MILLISECONDS),
                 this,
                 ProjCyclon.system.dispatcher()
         );
@@ -226,5 +235,6 @@ public class Peer extends UntypedActor implements Runnable {
     public void stopAutoUpdate() {
         updater.cancel();
     }
+
 
 }

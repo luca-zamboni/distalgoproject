@@ -16,6 +16,8 @@ import scala.Serializable;
  */
 public class MessagePeer implements Serializable{
     
+    public static final int DIED = -1;
+    
     public final int type;
     public final String sender;
     public final ArrayList<MyActor> peer;

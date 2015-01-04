@@ -47,7 +47,7 @@ public class MyPanel extends JPanel{
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    peer.run();
+                    peer.active = false;
                 }
             });
             pan.add(button);

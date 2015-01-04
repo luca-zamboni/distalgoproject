@@ -23,8 +23,6 @@ public class Tracker extends UntypedActor{
     public static final int DEF_PEER_NUM = Peer.DEF_CONTAINED;
     
     ArrayList<MyActor> peer;
-    
-    int myKey = -1;
 
     @Override
     public void preStart() throws Exception {
