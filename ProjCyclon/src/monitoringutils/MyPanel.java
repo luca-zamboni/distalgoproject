@@ -88,7 +88,7 @@ public class MyPanel extends JPanel{
         
         this.add(stat,BorderLayout.NORTH);
         this.add(left,BorderLayout.WEST);
-        this.add(prin,BorderLayout.CENTER);
+        //this.add(prin,BorderLayout.CENTER);
             
     }
     

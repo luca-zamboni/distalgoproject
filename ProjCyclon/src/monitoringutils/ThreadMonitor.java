@@ -26,7 +26,7 @@ public class ThreadMonitor extends Thread {
     @Override
     public void run() {
         try {
-            sleep(200);
+            sleep(2000);
 
             MyPanel pan = new MyPanel();
             JFrame frame = new JFrame("Monitor");
