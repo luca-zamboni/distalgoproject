@@ -118,7 +118,7 @@ if __name__ == '__main__':
 	# g= prepare_graph(lists)
 
 	
-	g = create_graph(open_csv("../data/39.txt"))
+	g = create_graph(open_csv("../data/0.txt"))
 
 
 
