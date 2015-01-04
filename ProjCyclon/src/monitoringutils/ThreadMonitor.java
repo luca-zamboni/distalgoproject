@@ -2,6 +2,9 @@ package monitoringutils;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.logging.Level;
@@ -18,6 +21,7 @@ public class ThreadMonitor extends Thread {
     
     public static final String AVERAGE = "Average neighbors : ";
     public static final String AVERAGE_CYCLE = "Average cycle : ";
+    public static final String DIR_TO_SAVE = "data/";
 
     @Override
     public void run() {
@@ -73,6 +77,12 @@ public class ThreadMonitor extends Thread {
                 avCycle = avCycle / Registro.reg.size();
                 pan.mediaPeer.setText(AVERAGE + round(average, 2));
                 pan.mediaCycle.setText(AVERAGE_CYCLE + round(avCycle, 2));
+                
+                try{   
+                    saveStat(avCycle);
+                }catch(Exception e){
+                    System.err.println("Errore a stampare dati");
+                }
 
             } catch (Exception ex) {
                 Logger.getLogger(ThreadMonitor.class.getName()).log(Level.SEVERE, null, ex);
@@ -82,11 +92,25 @@ public class ThreadMonitor extends Thread {
     }
     
     public double round(double value, int places) {
-    if (places < 0) throw new IllegalArgumentException();
+        if (places < 0) throw new IllegalArgumentException();
 
-    BigDecimal bd = new BigDecimal(value);
-    bd = bd.setScale(places, RoundingMode.HALF_UP);
-    return bd.doubleValue();
-}
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+    private void saveStat(double avCycle) throws FileNotFoundException, UnsupportedEncodingException {
+        int av =(int) avCycle;
+        PrintWriter writer = new PrintWriter(DIR_TO_SAVE + av + ".txt", "UTF-8");
+        for (Peer p : Registro.reg) {
+            String t = "";
+            t+= p.name();
+            for (MyActor a : p.neighbors) {
+                t = t + "," + a.getActor();
+            }
+            writer.println(t);
+        }
+        writer.close();
+    }
 
 }

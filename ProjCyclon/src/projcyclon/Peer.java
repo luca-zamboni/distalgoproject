@@ -22,8 +22,8 @@ import scala.concurrent.duration.Duration;
 public class Peer extends UntypedActor implements Runnable {
 
     public static final int delta = 200;
-    public static final int DEF_PEER_NUM = 3;
-    public static final int DEF_CONTAINED = 4;
+    public static final int DEF_PEER_NUM = 5;
+    public static final int DEF_CONTAINED = 10;
 
     public boolean active = true;
 
@@ -76,7 +76,7 @@ public class Peer extends UntypedActor implements Runnable {
                 case 2:
                     if (m.sender.equals(toRecive.getActor())) {
                         addNewNeighbor(m.type, m.sender, m.peer);
-                        //startAutoUpdate();
+                        startAutoUpdate();
                     }
                     break;
             }
