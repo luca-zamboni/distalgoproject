@@ -3,6 +3,7 @@ import csv
 from pygraph.classes.graph import graph
 from pygraph.algorithms.heuristics.chow import chow
 from pygraph.algorithms.minmax import shortest_path
+from os import listdir
 
 def calcAvPathLength(gr):
 	av = 0.0
@@ -112,31 +113,14 @@ if __name__ == '__main__':
 
 
 
-	#print find_shortest_path(gr, 'A', 'E')
-	# print(calcAvPathLength(gr))
 
-	# g= prepare_graph(lists)
 
+	fl = listdir("../data")
 	
-	g = create_graph(open_csv("../data/0.txt"))
+	for i in fl :
+
+		g = create_graph(open_csv("../data/"+i))
+		p = calcAvPathLength(g)
+		print(p)
 
 
-
-	# print(p)
-
-
-	#g = create_graph(lists)
-
-
-
-
-	#c= chow("B")
-	#c.optimize(q)
-	#print(c.centers)
-	#print(c('A','B'))
-
-	#print(q.neighbors("C"))
-	
-	p = calcAvPathLength(g)
-
-	print(p)
