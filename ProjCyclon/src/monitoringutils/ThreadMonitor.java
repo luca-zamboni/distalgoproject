@@ -112,7 +112,6 @@ public class ThreadMonitor extends Thread {
             for (MyActor a : p.neighbors) {
                 t = t + "," + a.getActor();
             }
-            t += ";";
             writer.println(t);
         }
         writer.close();
