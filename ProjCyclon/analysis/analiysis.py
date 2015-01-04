@@ -1,51 +1,24 @@
 import csv
 
-from pygraph.classes.graph import graph
-from pygraph.algorithms.heuristics.chow import chow
-from pygraph.algorithms.minmax import shortest_path
-from os import listdir
 
-def calcAvPathLength(gr):
+from os import listdir
+from random import sample
+
+
+import networkx as nx
+
+def avg_path_len(gr):
 	av = 0.0
 	i = 0
 
-	for start in gr :
-		dj = shortest_path(gr,start)[1]
-		for end in dj :
-			if start != end :
-				l = dj[end]
-				av+= l
-				i +=1
+	lengths = nx.all_pairs_shortest_path_length(gr)
+
+	for k in lengths :
+		for j in lengths[k]:
+			av += lengths[k][j]
+			i += 1
 
 	return av/i
-
-
-
-	#for n in nodes:
-		#for n2 in nodes:
-		#	if(n!=n2):
-		#		print(n +" " + n2)
-		#		#av += len(find_shortest_path(nodes,n,n2))
-		#		i+=1
-
-	#av = av / i
-	#print(av)
-
-			
-#def find_shortest_path(graph, start, end, path=[]):
-#	path = path + [start]
-#	if start == end:
-#		return path
-#	if not graph.has_key(start):
-#		return None
-#	shortest = None
-#	for node in graph[start]:
-#		if node not in path:
-#			newpath = find_shortest_path(graph, node, end, path)
-#			if newpath:
-#				if not shortest or len(newpath) < len(shortest):
-#					shortest = newpath
-#	return shortest
 
 
 
@@ -53,56 +26,114 @@ def open_csv(path):
 	with open(path,"r") as d :
 		return list(csv.reader(d))	
 
-def prepare_graph(l) :
 
-	#------------------------ adding nodes ot the graph
-	graph = {}
-	for peer  in l :
-		graph[peer[0]] = set()
-	
-	#-------------------- adding edges
-	for peer in l :
-		for neighbor in peer[1:] :
-			graph[peer[0]].add(neighbor)
-			graph[neighbor].add(peer[0])
-
-	#-------------------- converting from set to lists
-
-	for node in graph :
-		if node in graph[node] : #if the key is in its value remove it
-			graph[node].remove(node)
-		graph[node] = list(graph[node])
-
-	return graph
-
-
-	
 
 def create_graph(l) :
-	gr = graph()
+	gr = nx.Graph()
 
 	for peer in l :
 		gr.add_node(peer[0])
 
 	for peer in l :
 		for neighbor in peer[1:] :
-			if not gr.has_edge((peer[0],neighbor)) :
-				gr.add_edge((peer[0],neighbor))
-
+			if not gr.has_edge(peer[0],neighbor) :
+				gr.add_edge(peer[0],neighbor)
 
 
 	return gr
 
 
+def sorter(a) :
+	sa = a.split(".")
+
+
+	if sa[-1] == "txt" :
+		try:
+			return int(sa[0]) 
+			
+		except  ValueError :
+			raise ValueError(a+" non e' un file con un nome valido ")
+	
+	else :
+		raise ValueError(a+" non e' un file con un nome valido ")
+
+
+def clusterng_coefficient(gr) :
+
+	return nx.average_clustering(gr)
+
+
+def robustness_test(gr,minimum=75.0,maximum=98.0,distance=0.5) :
+	repetitions = 20
+	res = []
+	nodes = gr.nodes()
+
+	points =int((maximum-minimum)/distance)
+
+	for n in range(0,points+1) :
+		cluster = 0
+		
+		for rep in range(0,repetitions) :
+			samp = sample(nodes,int(len(nodes)*(minimum+distance*n)/100))
+			copy = nx.Graph(gr)
+			copy.remove_nodes_from(samp)
+			cluster+= nx.number_connected_components(copy)
+
+		cluster = int(cluster/repetitions)
+		res.append((minimum+distance*n,cluster))
+
+	return res
+
+
+def marked_peers(data) :
+	signal="dead"
+
+	marked_set = set()
+
+	for i in data :
+		if i[-1] == signal :
+			marked_set.add(i[0])
+
+	return marked_set	
+
+def self_cleaning_capacity(data) :
+
+	dead_peers = marked_peers(data)
+
+	founded_peers = set()
+
+	for i in data :
+		if not i[0] in dead_peers :
+		
+			for j in i[1:] :
+				if j in dead_peers :
+					founded_peers.add(j)
+
+	return len(founded_peers)
+
+
+def degree_distribution(gr) :
+
+	deg_count = {}
+
+	for d in gr.degree().values() :
+		if d in deg_count :
+			deg_count[d] +=1
+		else :
+			deg_count[d] = 1
+
+	l = list(deg_count.keys())
+	l.sort()
+	for i in range(0,len(l)) :
+		l[i]= (l[i],deg_count[l[i]])
+
+	return l
+		
+
 
 if __name__ == '__main__':
 
-	gr = {'A': ['B', 'C'],
-			'B': ['A','C', 'D'],
-			'C': ['D','A','B','F'],
-			'D': ['E','C','B'],
-			'E': ['F','D'],
-			'F': ['C','E']}
+
 
 	lists = [ ['A','B', 'C',],
 	        ['B','C', 'D'],
@@ -116,11 +147,17 @@ if __name__ == '__main__':
 
 
 	fl = listdir("../data")
+	fl.sort(key=sorter)
 	
-	for i in fl :
+	for i in fl[-1:]:
 
 		g = create_graph(open_csv("../data/"+i))
-		p = calcAvPathLength(g)
-		print(p)
+
+		n = int(i.split(".")[0])
+		c = clusterng_coefficient(g)
+		p = avg_path_len(g)
+		#r = robustness_test(g)
+		d = degree_distribution(g)
+		print(n,p,c,d)
 
 
