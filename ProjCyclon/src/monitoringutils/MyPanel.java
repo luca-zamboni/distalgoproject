@@ -11,11 +11,14 @@ import java.awt.GridLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import projcyclon.MyActor;
 import projcyclon.Peer;
 
 /**
@@ -57,7 +60,7 @@ public class MyPanel extends JPanel{
         }
         
         JPanel left = new JPanel();
-        left.setLayout(new GridLayout(2, 1));
+        left.setLayout(new GridLayout(4, 1));
         
         JButton start = new JButton("Start");
         start.addActionListener(new ActionListener() {
@@ -80,6 +83,35 @@ public class MyPanel extends JPanel{
             }
         });
         left.add(stop);
+        
+        JButton kill = new JButton("Kill half");
+        kill.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Peer> half =  Registro.reg.subList(0,Registro.reg.size()/2 );
+                for (final Peer peer : half) {
+                    peer.deactive();
+                }
+            }
+        });
+        left.add(kill);
+        
+        JButton attacco = new JButton("Attack!!!!");
+        attacco.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Peer> half =  Registro.reg.subList(0,50);
+                for (final Peer peer : half) {
+                    long timastamp = System.currentTimeMillis();
+                    for (final Peer peer2 : half) {
+                        peer.maliciusNeighbors.add(new MyActor(timastamp, peer2.name()));
+                    }
+                    peer.startAttack();
+                    System.err.println(peer.name() + " son cattivo");
+                }
+            }
+        });
+        left.add(attacco);
         
         mediaPeer = new JLabel();
         stat.add(mediaPeer);

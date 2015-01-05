@@ -6,13 +6,9 @@ import akka.actor.Cancellable;
 import akka.actor.UntypedActor;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import monitoringutils.Registro;
 import scala.concurrent.duration.Duration;
 
@@ -22,13 +18,17 @@ import scala.concurrent.duration.Duration;
  */
 public class Peer extends UntypedActor implements Runnable {
 
-    public static final int DELTA = 200;
+    public static final int DELTA = 10000;
     public static final int DEF_PEER_NUM = 10;
     public static final int DEF_CONTAINED = 20;
 
     public boolean active = true;
+    
+    public boolean attack = false;
 
     public List<MyActor> neighbors = Collections.synchronizedList(new ArrayList());
+    
+    public List<MyActor> maliciusNeighbors = Collections.synchronizedList(new ArrayList());
 
     public List<MyActor> savedNeighbors = Collections.synchronizedList(new ArrayList());
     public List<MyActor> savedNeighborsBis = Collections.synchronizedList(new ArrayList());
@@ -52,24 +52,18 @@ public class Peer extends UntypedActor implements Runnable {
 
         getInitialPeerFromTracker();
 
-        /*/**/
-        /*ProjCyclon.system.scheduler().scheduleOnce(
-         Duration.create(1000, TimeUnit.MILLISECONDS),
-         this,
-         ProjCyclon.system.dispatcher()
-         );/**/
     }
 
     @Override
     public void onReceive(Object message) throws Exception {
-        if (message instanceof MessagePeer) {
+        if (message instanceof MessagePeer){
             MessagePeer m = (MessagePeer) message;
             if(active){
                 switch (m.type) {
                     case MessagePeer.DIED:
                         merge(m.type, m.sender, m.peer);
                         removeNodeFromNeighbors(m.sender);
-                        //AutoUpdateNow();
+                        AutoUpdateNow();
                         break;
                     case 0:
                         merge(m.type, m.sender, m.peer);
@@ -81,7 +75,7 @@ public class Peer extends UntypedActor implements Runnable {
                     case 2:
                         if (m.sender.equals(toRecive.getActor())) {
                             merge(m.type, m.sender, m.peer);
-                            //startAutoUpdate();
+                            startAutoUpdate();
                         }
                         break;
                 }
@@ -123,15 +117,39 @@ public class Peer extends UntypedActor implements Runnable {
 
     private void send(int type, MyActor to) {
         ArrayList<MyActor> peerReply = new ArrayList<>();
-        if(active){
+        if(active && !attack){
             if (type == 1) {
                 peerReply = getPeerRandom(to.getActor());
             } else {
                 peerReply = getPeerForReply(to.getActor());
             }
         }
-
+        if(attack){
+            peerReply = getMaliciousPeer(to.getActor());
+        }
+        
         getPointer(to.getActor()).tell(new MessagePeer(type, name(), peerReply), null);
+    }
+    
+    private ArrayList<MyActor> getMaliciousPeer(String actor) {
+        ArrayList<MyActor> ret = new ArrayList<>();
+        try {
+            Collections.shuffle(maliciusNeighbors);
+            for (int i = 0; i < DEF_PEER_NUM - 1 && i < maliciusNeighbors.size(); i++) {
+                if (!maliciusNeighbors.get(i).equals(new MyActor(i, actor))) {
+                    //System.err.println(maliciusNeighbors.get(i));
+                    ret.add(maliciusNeighbors.get(i));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Errore " + name());
+        }
+        Long time = System.currentTimeMillis();
+        
+        savedNeighbors.addAll(ret);
+        ret.add(new MyActor(time, name()));
+        maliciusNeighbors.remove(new MyActor(0, actor));
+        return ret;
     }
 
     private final ArrayList<MyActor> getPeerRandom(String actor) {
@@ -237,9 +255,14 @@ public class Peer extends UntypedActor implements Runnable {
                 ProjCyclon.system.dispatcher()
         );
     }
-
     public void stopAutoUpdate() {
         updater.cancel();
+    }
+    public void deactive(){
+        active = false;
+    }
+    public void startAttack(){
+        attack = true;
     }
 
 

@@ -16,17 +16,19 @@ import projcyclon.Peer;
 /**
  *
  * @author luca
+ * 
  */
 public class ThreadMonitor extends Thread {
 
     public static final String AVERAGE = "Average neighbors : ";
     public static final String AVERAGE_CYCLE = "Average cycle : ";
-    public static final String DIR_TO_SAVE = "data/";
+    public static final String DIR_TO_SAVE = "C:\\Users\\luca"
+            + "\\Google Drive\\Università\\Algo dist\\csv\\normal\\m20000\\";
 
     @Override
     public void run() {
         try {
-            sleep(5000);
+            sleep(10000);
 
             MyPanel pan = new MyPanel();
             JFrame frame = new JFrame("Monitor");
@@ -54,7 +56,7 @@ public class ThreadMonitor extends Thread {
 
             while (true) {
                 try {
-                    sleep(200);
+                    sleep(50);
                     double average = 0;
                     double avCycle = 0;
                     int active = 0;
@@ -111,6 +113,12 @@ public class ThreadMonitor extends Thread {
             t += p.name();
             for (MyActor a : p.neighbors) {
                 t = t + "," + a.getActor();
+            }
+            if(!p.active){
+                t+=",dead";
+            }
+            if(p.attack){
+                t+=",malicious";
             }
             writer.println(t);
         }
