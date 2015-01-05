@@ -46,7 +46,8 @@ def create_graph(l) :
 def sorter(a) :
 	sa = a.split(".")
 
-
+	if len(sa) !=2 :
+		raise ValueError(a+" non e' un file con un nome valido ")
 	if sa[-1] == "txt" :
 		try:
 			return int(sa[0]) 
@@ -63,7 +64,7 @@ def clusterng_coefficient(gr) :
 	return nx.average_clustering(gr)
 
 
-def robustness_test(gr,minimum=75.0,maximum=98.0,distance=0.5) :
+def robustness_test(gr,minimum=70.0,maximum=99.0,distance=1.0) :
 	repetitions = 20
 	res = []
 	nodes = gr.nodes()
@@ -129,6 +130,14 @@ def degree_distribution(gr) :
 
 	return l
 		
+def attack_resistance(gr,data) :
+
+	bad_list = marked_peers(data)
+
+	copy = nx.Graph(gr)
+	copy.remove_nodes_from(bad_list)
+
+	return nx.number_connected_components(copy)
 
 
 if __name__ == '__main__':
