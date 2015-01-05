@@ -26,7 +26,7 @@ public class ThreadMonitor extends Thread {
     @Override
     public void run() {
         try {
-            sleep(2000);
+            sleep(5000);
 
             MyPanel pan = new MyPanel();
             JFrame frame = new JFrame("Monitor");
@@ -54,7 +54,7 @@ public class ThreadMonitor extends Thread {
 
             while (true) {
                 try {
-                    sleep(100);
+                    sleep(200);
                     double average = 0;
                     double avCycle = 0;
                     int active = 0;
@@ -105,7 +105,7 @@ public class ThreadMonitor extends Thread {
 
     private void saveStat(double avCycle) throws FileNotFoundException, UnsupportedEncodingException {
         int av = (int) avCycle;
-        PrintWriter writer = new PrintWriter(DIR_TO_SAVE + av + ".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter(DIR_TO_SAVE + av + ".csv", "UTF-8");
         for (Peer p : Registro.reg) {
             String t = "";
             t += p.name();

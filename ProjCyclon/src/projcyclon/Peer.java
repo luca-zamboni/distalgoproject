@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import monitoringutils.Registro;
 import scala.concurrent.duration.Duration;
 
@@ -22,15 +23,15 @@ import scala.concurrent.duration.Duration;
 public class Peer extends UntypedActor implements Runnable {
 
     public static final int DELTA = 200;
-    public static final int DEF_PEER_NUM = 3;
-    public static final int DEF_CONTAINED = 10;
+    public static final int DEF_PEER_NUM = 10;
+    public static final int DEF_CONTAINED = 20;
 
     public boolean active = true;
 
-    public List<MyActor> neighbors = new ArrayList();
+    public List<MyActor> neighbors = Collections.synchronizedList(new ArrayList());
 
-    public List<MyActor> savedNeighbors = new ArrayList();
-    public List<MyActor> savedNeighborsBis = new ArrayList();
+    public List<MyActor> savedNeighbors = Collections.synchronizedList(new ArrayList());
+    public List<MyActor> savedNeighborsBis = Collections.synchronizedList(new ArrayList());
 
     public ActorRef tracker;
 
@@ -180,6 +181,7 @@ public class Peer extends UntypedActor implements Runnable {
         return neighbors.get(0);
 
     }
+    
     private void removeNodeFromNeighbors(String sender) {
         neighbors.remove(new MyActor(0,sender));
     }
@@ -189,7 +191,7 @@ public class Peer extends UntypedActor implements Runnable {
         try {
             while (neighbors.isEmpty() && active) {
 
-                //System.err.println(name() + " sono addormentato");
+                System.err.println(name() + " sono addormentato");
                 sleep(DELTA);
             }
 
@@ -201,7 +203,10 @@ public class Peer extends UntypedActor implements Runnable {
                 //System.err.println(name() + " send to " + toRecive);
             }
         } catch (Exception e) {
-            //System.err.println("No peer to contact " + name());
+            System.err.println("No peer to contact " + name());
+            //System.out.println(neighbors.size());
+            //e.printStackTrace();
+            startAutoUpdate();
         }
     }
 
@@ -219,10 +224,11 @@ public class Peer extends UntypedActor implements Runnable {
     }
 
     public void startAutoUpdate() {
-        updater = ProjCyclon.system.scheduler().scheduleOnce(Duration.create(DELTA, TimeUnit.MILLISECONDS),
+        if(active)
+            updater = ProjCyclon.system.scheduler().scheduleOnce(Duration.create(DELTA, TimeUnit.MILLISECONDS),
                 this,
                 ProjCyclon.system.dispatcher()
-        );
+            );
     }
     public void AutoUpdateNow() {
         updater = ProjCyclon.system.scheduler().scheduleOnce(
