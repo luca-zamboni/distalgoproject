@@ -13,13 +13,12 @@ import monitoringutils.Registro;
 import scala.concurrent.duration.Duration;
 
 /**
- *
  * @author luca & luca
  */
 public class Peer extends UntypedActor implements Runnable {
 
     public static final int DELTA = 10000;
-    public static final int DEF_PEER_NUM = 10;
+    public static final int DEF_PEER_NUM = 20;
     public static final int DEF_CONTAINED = 20;
 
     public boolean active = true;

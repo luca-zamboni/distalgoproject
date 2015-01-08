@@ -23,7 +23,7 @@ public class ThreadMonitor extends Thread {
     public static final String AVERAGE = "Average neighbors : ";
     public static final String AVERAGE_CYCLE = "Average cycle : ";
     public static final String DIR_TO_SAVE = "C:\\Users\\luca"
-            + "\\Google Drive\\Università\\Algo dist\\csv\\normal\\m20000\\";
+            + "\\Google Drive\\Università\\Algo dist\\csv\\normal\\p20s20\\m20000\\";
 
     @Override
     public void run() {
