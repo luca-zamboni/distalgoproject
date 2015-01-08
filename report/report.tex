@@ -141,7 +141,37 @@ What make every protocol different is the behaviour of
 \end{itemize}
 
 
+\section{ANALYSIS AND RESULTS}
+
+In this section we will discuss the results of simulations over the implemented protocol and some tests done under
+ partarticular conditions.
+
+\subsection{ANALYSIS METHODS}
+
+The output of the program was used to build  graphs, using the NetworkX libraries[CITAZIONE] in Python, where
+ nodes are peers and edges are the neighbors of every peer. We useed undirected graphs except for the 
+ computations of in-degrees, where we obviously built a directed graph with direction peer \(\rightarrow\) neigbor.
+ The switch to a graph structure allowed a series of operations, like the count of the connected components (or clusters), 
+ needed to interpret the shape of the network.
+
+We approximated a couple of opearation on the graph, in order to be able to execute it in a reasonable time. In 
+ particular the computation of the clustering coefficient was made using a function of NetworkX that make an approximation[LINK TO NETX CLUSTER]. The average path length was approximated computing the average path length of a number \(n\) of random couples of nodes.
 
 
+\subsection{STANDARD RUN}
+
+In these tests we executed the simulation without interfer during the run, so no crashes or 
+ communication failures were induced. This simulations were done bulding a network of 20.000 
+ peers with 20 neighbors and 10 of them exchanged at every cycle. In every simulation the Cyclon
+ graph is compared to a graph with the same number of nodes and the same number of edges randomly distributed.
+
+The first simulation[FIG] compares the approximated average path length of the two graphs. We can 
+ see that after few cycles the avg becames comparable with the one of the random graph. This is the 
+ optimum result in a network fully decentralized without a hyerarchy.
+
+ [IMMAGINE AVG LEN]
+
+
+The second simulation 
 
 \end{document}

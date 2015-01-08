@@ -37,10 +37,14 @@ def open_csv(path):
 	with open(path,"r") as d :
 		return list(csv.reader(d))	
 
+def select_graph(directed) :
+	if directed :
+		return nx.DiGraph()
+	else :
+		return nx.Graph()
 
-
-def create_graph(l) :
-	gr = nx.Graph()
+def create_graph(l,directed=False) :
+	gr = select_graph(directed)
 
 	for peer in l :
 		gr.add_node(peer[0])
@@ -114,6 +118,7 @@ def marked_peers(data,signal="dead") :
 def self_cleaning_capacity(data) :
 
 	dead_peers = marked_peers(data)
+	#print(len(dead_peers))
 
 	founded_peers = set()
 
@@ -131,7 +136,7 @@ def degree_distribution(gr) :
 
 	deg_count = {}
 
-	for d in gr.degree().values() :
+	for d in gr.in_degree().values() :
 		if d in deg_count :
 			deg_count[d] +=1
 		else :
