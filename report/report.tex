@@ -32,12 +32,15 @@
 \begin{abstract}
    	 	
     The topic of this work is the implementation of Cyclon, a decentralized
-    peer-to-peer protocol for gossiping over the Akka framework [URL AKKA REF].
+    peer-to-peer protocol for gossiping over the Akka framework \cite{Akka}.
     The goal of Cyclon is to build a network that can resist against crash of 
     a great part of its node without  collapsing in a series of disconnected clusters.
     This document will explain first the theoretical basis of the protocol, then 
-    our implementation of it. The last part of this work will be focused on the statistical
-    result of this project.
+    our implementation of a program pacable of simulating a Cyclon network. 
+    The last part of this work will be focused on the statistical
+    result of simulations made, discussing the capabilities of the network
+    to build a strongly connected graph, to resist to massive disconnection. The 
+    last test will show the limits of the protocol in case of hub attack.
   
 
 \end{abstract}
@@ -90,7 +93,7 @@ Nodes has only a partial views of the network, and this view is dynamic. Each no
  \begin{itemize}
  	\item the address of that node
  	\item a timestamp information about the age of the descriptor
- 	\item more additional information, maybe needed by the upper software layer[CITAZIONE MONTRE]
+ 	\item more additional information, maybe needed by the upper software layer\cite{slideMontre}
  \end{itemize}
 
 When a new node want to enter in the protocol asks to a tracker 
@@ -98,7 +101,7 @@ When a new node want to enter in the protocol asks to a tracker
 
  \subsection{SKELETON OF THE ALGORITHM}	
 Here is presented the structure of the code of an instance running Cyclon. The first algorithm shown 
- is common to a bunch of protocol with the same purpose, like Newscast[CITAZIONE].
+ is common to a bunch of protocol with the same purpose, like Newscast\cite{newscast}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -223,7 +226,7 @@ In this section we will discuss the results of simulations over the implemented 
 
 \subsection{ANALYSIS METHODS}
 
-The output of the program was used to build  graphs, using the NetworkX libraries[CITAZIONE] in Python, where
+The output of the program was used to build  graphs, using the NetworkX libraries\cite{netwx} in Python, where
  nodes are peers and edges are the neighbors of every peer. We used undirected graphs except for the 
  computations of in-degrees, where we obviously built a directed graph with direction peer \(\rightarrow\) neighbor.
  The switch to a graph structure allowed a series of operations, like the count of the connected components (or clusters), 
@@ -325,6 +328,37 @@ The last test executed was an hub attack test. We created 50 peers that exchange
 	\caption{Number of clusters created at every cycle by 50 malicious peers}
 	\label{attack}
 \end{figure}
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Akka}
+  The Akka framework,
+  \url{http://akka.io/}
+
+\bibitem{slideMontre}
+  Distributed Algorithms course,
+  Montresor Alberto,
+  slide ``epidemics2''
+
+
+\bibitem{newscast}
+  A Robust and Scalable Peer-to-Peer Gossiping Protocol by
+  Spyros Voulgaris, M´ark Jelasity and Maarten van Steen,
+
+\bibitem{netwx}
+  NetworkX,
+  \url{https://networkx.github.io/}
+
+
+
+\end{thebibliography}
+
+
+
+
+
+
 
 \end{document}
 
