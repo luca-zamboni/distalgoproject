@@ -1,7 +1,7 @@
 
 \documentclass[a4paper,12pt,notitlepage]{article} % Prepara un report per carta A4, con un font grande 12
  
-\usepackage[english]{babel} % Adatta LaTeX alle convenzioni tipografiche italiane,
+\usepackage[english]{babel} % Adatta LaTeX alle convenzioni tipografiche inglesi
 %\usepackage[T1]{fontenc} % Riga da togliere se si compila con PDFLaTeX
 %\usepackage[utf8]{inputenc} % Consente l'uso caratteri accentati italiani
 \usepackage[a4paper,top=3cm,bottom=3cm,left=2.0cm,right=2.0cm]{geometry}
@@ -56,6 +56,16 @@ The goal of this work is to implement a simulation of a peer-to-peer network run
  large number of peer clients and one or more tracker server, whose function is to allow new 
  peers to connect into the network. Now will follow a list of fast description of the topics of every
  section of this document.
+
+ \begin{itemize}
+ 	\item The system model section will describe the Cyclon protocol, showing  the general structure of 
+ 	the algorithms that implement it and focusing on the particular elements that characterize it.
+ 	\item The implementation section is focused on expalining the actual implementation of 
+ 	our simulation, discussing about the choices made by development and the input and
+ 	 ouput of the program.
+ 	\item The analysis and result section will show information about tests executed on 
+ 	the program, for evaluating some characteristic of Cyclon
+ \end{itemize}
 
 
 
@@ -141,6 +151,50 @@ What make every protocol different is the behaviour of
 \end{itemize}
 
 
+
+
+
+
+\section{IMPLEMENTATION}
+
+We have implemented protocol Cyclon with Akka framework in Java.
+We choose Akka because it offers a really good scalable Peer simulator and easy manage interface messages exchanging.
+
+\subsection{MESSAGE}
+	There are two type of message in our Project. When a Peer is 	created it sends a message of type Message.java to the tracker it contains only the information about the sender and nothing else. The other message of type MessagePeer.java contains the sender of the message and the list of Peer that you are exchanging and also the tye of the message. MessagePeer.java can take different values:
+\begin{itemize}
+  \item 0 If is the response of the Tracker
+  \item 1 If a Peer start an excange sending some Peer to another Peer.
+  \item 2 If it is a response for another that sent some Peer
+  \item -1 If this Peer is Died. This is only to simulate an under layer that says if a Peer is died.
+\end{itemize}
+
+\subsection{TRACKER}
+	Tracker.java has the task to give some adderes of Peers to a Peer that has been created. It recive a Message of type Message.java from the Peer, it subscribe the new Peer to the local List of Peers in the network. After that it choose n newest Peers in the list and send it back to the Peer a message that contains the list of Peer.
+
+\subsection{PEER}
+	This is the main class of the project. It simulates a role in hte network of Peers. This class has the following structure.  
+\begin{itemize}
+\item preStart(). It basically request the peer from tracker sending a Message.java and subscribe this peer to the monitor only for get data for statistic.
+\item onReceive(Object message). This function handles messagges. If type is 0 is justin itialize the list of neighbors. If type is 1 it sends a messagge of type 2 whith his n neighbors plus him to the sender of the message. After it merge the recived Peers. If type is 2 it just merge the recived Peer from the sender. If the type of the message is -1 it remove the sender from his neighbors.
+\item merge(int type, ArrayList<Peer> peers). Is a function that merge peers with local neighbors and if the size of the list remain under the minimum size it fill with older neighbors known in the previous cycle.
+\item send(int type, Peer to). If the type of the send is 1 it choose n-1 random peer. If it is 2 it choose last n peer with higher timestamp. After this it sends the choosen peer to the Peer.
+\item selectPeerToContact() select the neighbor with lower timestamp.
+\item run() After you get a reply with peers it waits DELTA time to restart a cycle.
+\item removeNodeFromNeighbors(Peer peer). Remove peer from list neighbors.
+
+\end{itemize}
+
+\subsection{COLLECTING DATA}
+	When a Peer is initialized he subscribe itself to the monitor. The monitor every DELTA seconds write on file neighbors of all peer with the number of average cycle of the list of peer and start a GUI that shows the evolution of the neighbors of peer.
+
+\subsection{SIMULATION}
+	When a Peer is created it subscribe itself to the monitor just to collect data for statistics. After it send a request the initial list of Peer to the Tracker. The Tracker write it to the global list of peers in the system and send back the subset of the newets in the network. The peer now start first cycle of his life. It select the peer with older timestamp and sends him his n-1 random neighbors with him added to the list with a fresh timestamp. The peer that recive the message select his older n neighbors and send it back to the sender and merge those who arrived with its local neighbors. Now the peer that started the request recive the list of peer and merge it with is's local view of the network and after that it start a new run after DELTA time. Every n second monitor write on file the list of neighbors of each peer.
+
+
+
+
+
 \section{ANALYSIS AND RESULTS}
 
 In this section we will discuss the results of simulations over the implemented protocol and some tests done under
@@ -158,20 +212,100 @@ We approximated a couple of opearation on the graph, in order to be able to exec
  particular the computation of the clustering coefficient was made using a function of NetworkX that make an approximation[LINK TO NETX CLUSTER]. The average path length was approximated computing the average path length of a number \(n\) of random couples of nodes.
 
 
-\subsection{STANDARD RUN}
+
+\subsection{GENERAL TESTS}
 
 In these tests we executed the simulation without interfer during the run, so no crashes or 
  communication failures were induced. This simulations were done bulding a network of 20.000 
  peers with 20 neighbors and 10 of them exchanged at every cycle. In every simulation the Cyclon
  graph is compared to a graph with the same number of nodes and the same number of edges randomly distributed.
 
-The first simulation[FIG] compares the approximated average path length of the two graphs. We can 
+The first simulation  (figure \ref{avg}) compares the approximated average path length of the two graphs. We can 
  see that after few cycles the avg becames comparable with the one of the random graph. This is the 
  optimum result in a network fully decentralized without a hyerarchy.
 
- [IMMAGINE AVG LEN]
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/avgplen}
+	\caption{Average path length of random graph and Cyclon graph throught  cycles }
+	\label{avg}
+\end{figure}
 
 
-The second simulation 
+The figure \ref{deg} shows the in-degree nodes distribution for the Cyclon and the random graph.
+ The results show how the Cyclon graph has more nodes near the mean (20) than the random graph.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/Degrees}
+	\caption{In-degree distribution for Cyclon and random graph}
+	\label{deg}
+\end{figure}
+
+
+\subsubsection{ROBUSTNESS TESTS}
+These simulation wants to show the robustness of the Cyclon protocol, that means its non
+ hyerarchical structure, that prevents damage in case of disconnection becouse there aren't
+ foundamental peers for the network, and the resistance to massive node disconnection.
+
+The first simulation (graph \ref{clust}) regards the variation of the approximated clustering coefficient. The network,
+ after few cycles, reachs the levels of the random graph. This is considered an index of robustness of the 
+ network, becouse of it means that there aren't nodes more important (significantly connected) than others.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/clustering}
+	\caption{Clustering coefficient of random graph and Cyclon graph throught  cycles }
+	\label{clust}
+\end{figure}
+
+
+Another robustness test is the count of the connected components of the graph after the removal of a certain 
+ percentage of nodes in the network. For every percentage tested we repeated for 10 times the removal of the
+ nodes and made an avegare if the clusters generated. The graph \ref{robust} shows how the network remains
+ connected until more than three quarters of nodes werre removed, obtaining results comparable to the random
+ graph.
+ 
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/robustness}
+	\caption{Connected components created by removing sertain percentages of nodes in Cyclon nd random graph}
+	\label{robust}
+\end{figure}
+
+ \subsection{LIVERNESS TESTS}
+
+Another important feature requested to this type of protocols is the ability of mantain their network
+ alive and free of garbage (references to peers still not present). We executed thise tests with three different 
+ simulation varying the parameters of the neighbors kept and exchanged. The network had 5000 peers and
+ 20-15-15 neighbor kept and 10-7-5 exchanged every cycle.
+
+The first test was the ability of self-cleaning. The results (fig \ref{sc}) show that the less number of neighbors
+ allows the network to forget of the dead peers faster. The number of neighbor exchanged seems influence
+ the speed of the process, in the sense that increasing the number of exchanged decrease the cycles needed
+ for clean the network.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/self_cleanin}
+	\caption{Number of cycles required to delete 2500 dead nodes}
+	\label{sc}
+\end{figure}
+
+The last test executed was an hub attack test. We created 50 peers that exchanged only themselves, and measured
+ at the end of every cycle the number of clusters after the removing of the malicious peers. As the 
+ figure \ref{attack} shows, the simple Cyclon protocol cannot resist and becames polluted after few tens of cycles.
+
+\begin{figure} [H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/attack}
+	\caption{Number of clusters created at every cycle by 50 malicious peers}
+	\label{attack}
+\end{figure}
+
+
+
+  
+
 
 \end{document}
