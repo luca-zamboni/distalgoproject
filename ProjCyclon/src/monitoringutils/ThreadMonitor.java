@@ -22,13 +22,12 @@ public class ThreadMonitor extends Thread {
 
     public static final String AVERAGE = "Average neighbors : ";
     public static final String AVERAGE_CYCLE = "Average cycle : ";
-    public static final String DIR_TO_SAVE = "C:\\Users\\luca"
-            + "\\Google Drive\\Università\\Algo dist\\csv\\normal\\p20s20\\m20000\\";
+    public static final String DIR_TO_SAVE = "./data/";
 
     @Override
     public void run() {
         try {
-            sleep(10000);
+            sleep(15000);
 
             MyPanel pan = new MyPanel();
             JFrame frame = new JFrame("Monitor");
@@ -79,7 +78,6 @@ public class ThreadMonitor extends Thread {
                     avCycle = avCycle / active;
                     pan.mediaPeer.setText(AVERAGE + round(average, 2));
                     pan.mediaCycle.setText(AVERAGE_CYCLE + round(avCycle, 2));
-
                     try {
                         saveStat(avCycle);
                     } catch (Exception e) {

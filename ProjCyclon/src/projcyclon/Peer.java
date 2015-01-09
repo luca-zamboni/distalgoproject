@@ -17,8 +17,8 @@ import scala.concurrent.duration.Duration;
  */
 public class Peer extends UntypedActor implements Runnable {
 
-    public static final int DELTA = 10000;
-    public static final int DEF_PEER_NUM = 20;
+    public static final int DELTA = 1000;
+    public static final int DEF_PEER_NUM = 5;
     public static final int DEF_CONTAINED = 20;
 
     public boolean active = true;
@@ -62,7 +62,7 @@ public class Peer extends UntypedActor implements Runnable {
                     case MessagePeer.DIED:
                         merge(m.type, m.sender, m.peer);
                         removeNodeFromNeighbors(m.sender);
-                        AutoUpdateNow();
+                        //AutoUpdateNow();
                         break;
                     case 0:
                         merge(m.type, m.sender, m.peer);
@@ -74,7 +74,7 @@ public class Peer extends UntypedActor implements Runnable {
                     case 2:
                         if (m.sender.equals(toRecive.getActor())) {
                             merge(m.type, m.sender, m.peer);
-                            startAutoUpdate();
+                            //startAutoUpdate();
                         }
                         break;
                 }
@@ -177,7 +177,7 @@ public class Peer extends UntypedActor implements Runnable {
             Collections.sort(neighbors, new MyActor(0, ""));
             for (int i = 0; i < DEF_PEER_NUM && i < neighbors.size(); i++) {
                 if (!neighbors.get(i).equals(new MyActor(i, actor))) {
-                    ret.add(neighbors.remove(i));
+                    ret.add(neighbors.remove(neighbors.size() - i -1));
                 }
             }
         } catch (Exception e) {
@@ -212,6 +212,7 @@ public class Peer extends UntypedActor implements Runnable {
                 sleep(DELTA);
             }
 
+                            
             if(active){
                 cycle++;
                 toRecive = selectPeerToContact();
