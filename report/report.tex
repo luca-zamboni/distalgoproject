@@ -21,7 +21,7 @@
 \usepackage{setspace}
 \usepackage{fontspec} % permette di cambiare il font
 \setmainfont{Calibri}
- 
+
 \onehalfspacing % forza LaTeX ad una spaziatura uniforme, invece di lasciare più spazio
 % alla fine dei punti fermi come da convenzione inglese
 
@@ -57,7 +57,7 @@ The goal of this work is to implement a simulation of a peer-to-peer network run
  the Cyclon gossiping's protocol, for the project of Distributed Algorithms, by Alberto Montresor. 
  The network is strongly decentralized and consist in a 
  large number of peer clients and one or more tracker server, whose function is to allow new 
- peers to connect into the network. Now will follow a list of fast description of the topics of every
+ peers to connect into the network. Now will follow a list of descriptions of the topics of every
  section of this document.
 
  \begin{itemize}
@@ -66,7 +66,7 @@ The goal of this work is to implement a simulation of a peer-to-peer network run
  	\item The implementation section is focused on explaining the actual implementation of 
  	our simulation, discussing about the choices made by development and the input and
  	 output of the program.
- 	\item The analysis and result section will show information about tests executed on 
+ 	\item The analysis and result section will show informations about tests executed on 
  	the program, for evaluating some characteristic of Cyclon
  \end{itemize}
 
@@ -97,11 +97,12 @@ Nodes has only a partial views of the network, and this view is dynamic. Each no
  \end{itemize}
 
 When a new node want to enter in the protocol asks to a tracker 
- server a random subset of peers and start the communication.
+ server a random subset of peers and starts the communication.
 
  \subsection{SKELETON OF THE ALGORITHM}	
-Here is presented the structure of the code of an instance running Cyclon. The first algorithm shown 
+Here is presented the structure of the code of an instance running Cyclon. The algorithm
  is common to a bunch of protocol with the same purpose, like Newscast\cite{newscast}.
+
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -150,7 +151,7 @@ What make every protocol different is the behaviour of
 	subset plus a fresh local one
 	\item prepareReply(\(view, q\)) removes and return t freshest neighbors from the local view
 	\item merge(\(view, m, q\)) merges the local view and the one received, if there are duplicates keeps only the 
-	freshest. Remove itself and reinsert entries sent to \(q\) if space permits
+	freshest. Removes itself and reinsert entries sent to \(q\) if space permits
 \end{itemize}
 
 
@@ -161,7 +162,7 @@ What make every protocol different is the behaviour of
 \section{IMPLEMENTATION}
 
 We have implemented protocol Cyclon with Akka framework in Java.
-We choose Akka because it offers a really good scalable Peer simulator and easy manage interface messages exchanging.
+We have choosen Akka because it offers a really good scalable Peer simulator and easy manage interface messages exchanging.
 
 \subsection{MESSAGE}
 	There are two type of message in our Project. When a Peer is 	created it sends a message of type Message.java to 
@@ -169,50 +170,49 @@ the tracker it contains only the information about the sender and nothing else. 
 contains the sender of the message and the list of Peer that you are exchanging and also the type of the message. 
 MessagePeer.java can take different values:
 \begin{itemize}
-  \item 0 If is the response of the Tracker
+  \item 0 If it is the response of the Tracker.
   \item 1 If a Peer start an exchange sending some Peer to another Peer.
-  \item 2 If it is a response for another that sent some Peer
-  \item -1 If this Peer is Died. This is only to simulate an under layer that says if a Peer is died.
+  \item 2 If it is a response for another that sent some Peer.
+  \item -1 If this Peer is Died. This is only to simulate a dead peer.
 \end{itemize}
 
 \subsection{TRACKER}
-	Tracker.java has the task to give some address of Peers to a Peer that has been created. It receive a Message of 
-type Message.java from the Peer, it subscribe the new Peer to the local List of Peers in the network. After that it choose 
-n newest Peers in the list and send it back to the Peer a message that contains the list of Peer.
+	Tracker.java has the task to give some address of peers to a Peer that has been created. It receives a Message of 
+type Message.java from the Peer, it subscribe the new Peer to the local List of Peers in the network. After that it chooses 
+\(n\) newest Peers in the list and sends it back to the Peer a message that contains the list.
 
 \subsection{PEER}
-	This is the main class of the project. It simulates a role in the network of Peers. This class has the following 
-structure.  
+	This is the main class of the project. It simulates a Peer in the network. This class has the following structure:  
 \begin{itemize}
-\item preStart(). It basically request the peer from tracker sending a Message.java and subscribe this peer to the monitor 
-only for get data for statistic.
-\item onReceive(Object message). This function handles messages. If type is 0 is just in itialize the list of neighbors. If 
-type is 1 it sends a message of type 2 with his n neighbors plus him to the sender of the message. After it merge the 
-received Peers. If type is 2 it just merge the received Peer from the sender. If the type of the message is -1 it remove the 
+\item preStart(). Basically requests the peer from tracker sending a Message.java and subscribes this peer to the monitor 
+ for get data for statistic.
+\item onReceive(Object message). This function handles messages. If type is 0 is just  itializes the list of neighbors. If 
+type is 1 it sends a message of type 2 with his \(n\) neighbors plus him. After reply it merges the 
+received Peers. If type is 2 it just merge the received Peer from the sender. If the type of the message is -1  removes the 
 sender from his neighbors.
-\item merge(int type, ArrayList<Peer> peers). Is a function that merge peers with local neighbors and if the size of the 
-list remain under the minimum size it fill with older neighbors known in the previous cycle.
-\item send(int type, Peer to). If the type of the send is 1 it choose n-1 random peer. If it is 2 it choose last n peer 
+\item merge(int type, ArrayList<Peer> peers). Is a function that merges peers with local neighbors and if the size of the 
+list remains under the minimum size it fills with older neighbors known in the previous cycle.
+\item send(int type, Peer to). If the type of the message is 1 it choose n-1 random peer. If it is 2 it choose last n peer 
 with higher timestamp. After this it sends the chosen peer to the Peer.
-\item selectPeerToContact() select the neighbor with lower timestamp.
-\item run() After you get a reply with peers it waits DELTA time to restart a cycle.
-\item removeNodeFromNeighbors(Peer peer). Remove peer from list neighbors.
+\item selectPeerToContact() selects the neighbor with lower timestamp.
+\item run() waits DELTA time to restart a cycle.
+\item removeNodeFromNeighbors(Peer peer). Removes peer from list neighbors.
 
 \end{itemize}
 
 \subsection{COLLECTING DATA}
-	When a Peer is initialized he subscribe itself to the monitor. The monitor every DELTA seconds write on file 
-neighbors of all peer with the number of average cycle of the list of peer and start a GUI that shows the evolution of the 
-neighbors of peer.
+	When a Peer is initialized he subscribes itself to the monitor. The monitor every DELTA seconds writes on file the 
+neighbors of every peer with the average of the  number of cycle and start a GUI that shows the evolution of the 
+neighbors of peers.
 
 \subsection{SIMULATION}
-	When a Peer is created it subscribe itself to the monitor just to collect data for statistics. After it send a 
-request the initial list of Peer to the Tracker. The Tracker write it to the global list of peers in the system and send 
-back the subset of the newest in the network. The peer now start first cycle of his life. It select the peer with older 
-timestamp and sends him his n-1 random neighbors with him added to the list with a fresh timestamp. The peer that receive 
-the message select his older n neighbors and send it back to the sender and merge those who arrived with its local 
-neighbors. Now the peer that started the request receive the list of peer and merge it with is's local view of the network 
-and after that it start a new run after DELTA time. Every n second monitor write on file the list of neighbors of each 
+	When a Peer is created it subscribes itself to the monitor  just to collect data for statistics. After it sends a 
+request the initial list of Peers to the Tracker. The Tracker writes it to the global list of peers in the system and sends 
+back the subset of the newests in the network. The peer now starts first cycle of his life. It selects the peer with older 
+timestamp and sends him his n-1 random neighbors with himself added to the list with a fresh timestamp. The peer that receives 
+the message selects his older n neighbors and sends it back to the sender and merge those who arrived with its local 
+neighbors. Now the peer that started the request receives the list of peers and merges it with is's local view of the network 
+and after that it starts a new run after DELTA time. Every n second monitor writes on file the list of neighbors of each 
 peer.
 
 
@@ -234,7 +234,7 @@ The output of the program was used to build  graphs, using the NetworkX librarie
 
 We approximated a couple of operation on the graph, in order to be able to execute it in a reasonable time. In 
  particular the computation of the clustering coefficient was made using a function of NetworkX that make an 
-approximation[LINK TO NETX CLUSTER]. The average path length was approximated computing the average path length of a number 
+approximation. The average path length was approximated computing the average path length of a number 
 \(n\) of random couples of nodes.
 
 
@@ -270,7 +270,7 @@ The figure \ref{deg} shows the in-degree nodes distribution for the Cyclon and t
 
 
 \subsubsection{ROBUSTNESS TESTS}
-These simulation wants to show the robustness of the Cyclon protocol, that means its non
+These simulations want to show the robustness of the Cyclon protocol, that means its non
  hierarchical structure, that prevents damage in case of disconnection because there aren't
  fundamental peers for the network, and the resistance to massive node disconnection.
 
@@ -288,14 +288,14 @@ The first simulation (graph \ref{clust}) regards the variation of the approximat
 
 Another robustness test is the count of the connected components of the graph after the removal of a certain 
  percentage of nodes in the network. For every percentage tested we repeated for 10 times the removal of the
- nodes and made an average if the clusters generated. The graph \ref{robust} shows how the network remains
+ nodes and made an average of the clusters generated. The graph \ref{robust} shows how the network remains
  connected until more than three quarters of nodes were removed, obtaining results comparable to the random
  graph.
  
 \begin{figure} [H]
 	\centering
 	\includegraphics[width=1\textwidth]{img/robustness}
-	\caption{Connected components created by removing certain percentages of nodes in Cyclon nd random graph}
+	\caption{Connected components created by removing certain percentages of nodes in Cyclon and in the random graph}
 	\label{robust}
 \end{figure}
 
@@ -329,6 +329,10 @@ The last test executed was an hub attack test. We created 50 peers that exchange
 	\label{attack}
 \end{figure}
 
+
+% \subsection{CONCLUSIONS}
+% The tests executed on the network showed that the implemented simulation respects all the expectations
+%  of a standard Cyclon protocol. The execution 
 
 \begin{thebibliography}{9}
 
