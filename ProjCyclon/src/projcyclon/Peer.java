@@ -123,7 +123,7 @@ public class Peer extends UntypedActor implements Runnable {
                 peerReply = getPeerForReply(to.getActor());
             }
         }
-        if(attack){
+        if(active && attack){
             peerReply = getMaliciousPeer(to.getActor());
         }
         
@@ -183,7 +183,7 @@ public class Peer extends UntypedActor implements Runnable {
         } catch (Exception e) {
             System.out.println("Errore " + name() + " " + e.getMessage());
         }
-            savedNeighborsBis.addAll(ret);
+        savedNeighborsBis.addAll(ret);
         return ret;
     }
 
