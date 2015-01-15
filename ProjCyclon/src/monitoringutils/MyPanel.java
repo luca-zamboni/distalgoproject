@@ -118,7 +118,7 @@ public class MyPanel extends JPanel{
         attacco.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Peer> half =  Registro.reg.subList(0,5);
+                List<Peer> half =  Registro.reg.subList(0,Peer.DEF_CONTAINED);
                 for (final Peer peer : half) {
                     long timastamp = System.currentTimeMillis();
                     for (final Peer peer2 : half) {
