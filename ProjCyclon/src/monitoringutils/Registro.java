@@ -17,4 +17,6 @@ public class Registro {
     
     public static ArrayList<Peer> reg = new ArrayList<>();
     
+    public static ArrayList<Peer> mal = new ArrayList<>();
+    
 }

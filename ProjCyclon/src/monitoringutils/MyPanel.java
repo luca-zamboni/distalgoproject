@@ -12,6 +12,7 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JButton;
@@ -54,6 +55,23 @@ public class MyPanel extends JPanel{
                 }
             });
             pan.add(button);
+            
+            JButton button2 = new JButton("Malicious");
+            button2.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    long timastamp = System.currentTimeMillis();
+                    Collections.shuffle(Registro.mal);
+                    for (final Peer peer2 : Registro.mal){
+                        peer2.maliciusNeighbors.add(new MyActor(timastamp, peer.name()));
+                    }
+                    Registro.mal.add(peer);
+                    peer.startAttack();
+                    
+                }
+            });
+            pan.add(button2);
+            
             pan.add(area);
             
             prin.add(pan);
@@ -100,7 +118,7 @@ public class MyPanel extends JPanel{
         attacco.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                List<Peer> half =  Registro.reg.subList(0,50);
+                List<Peer> half =  Registro.reg.subList(0,5);
                 for (final Peer peer : half) {
                     long timastamp = System.currentTimeMillis();
                     for (final Peer peer2 : half) {
