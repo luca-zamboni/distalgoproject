@@ -18,8 +18,8 @@ import scala.concurrent.duration.Duration;
 public class Peer extends UntypedActor implements Runnable {
 
     public static final int DELTA = 100;
-    public static final int DEF_PEER_NUM = 2;
-    public static final int DEF_CONTAINED = 5;
+    public static final int DEF_PEER_NUM = ProjCyclon.scamb;
+    public static final int DEF_CONTAINED = ProjCyclon.nei;
 
     public boolean active = true;
     

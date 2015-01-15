@@ -23,6 +23,9 @@ public class ProjCyclon {
     
     public static ActorSystem system;
     public static ActorRef tracker;
+    public static int nei;
+    public static int scamb;
+    
 
     public static void main(String[] args) {
         
@@ -32,10 +35,17 @@ public class ProjCyclon {
         
         // DECOMMENTARE QUANDO CONSEGNAMO
         try {
-            String sNPeer = JOptionPane.showInputDialog("Quanti peer vuoi?");
+            String sNPeer = JOptionPane.showInputDialog("Number of Peers?");
+            String snei = JOptionPane.showInputDialog("Neighboars");
+            String sscamb = JOptionPane.showInputDialog("Changed?");
             NPeer = Integer.parseInt(sNPeer);
+            nei = Integer.parseInt(snei);
+            scamb = Integer.parseInt(sscamb);
         } catch (Exception e) {
             NPeer = 10;
+            nei = 5;
+            scamb = 2;
+            
         }
         
         //NPeer = 10;
