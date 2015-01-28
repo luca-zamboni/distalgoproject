@@ -1,0 +1,1 @@
+java -jar ./ProjCyclon/ProjCyclon.jar
