@@ -114,7 +114,7 @@ public class MyPanel extends JPanel{
         });
         left.add(kill);
         
-        JButton attacco = new JButton("Attack!!!!");
+        JButton attacco = new JButton("Attack");
         attacco.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
