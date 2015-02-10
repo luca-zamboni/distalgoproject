@@ -81,7 +81,7 @@ public class ThreadMonitor extends Thread {
                     try {
                         saveStat(avCycle);
                     } catch (Exception e) {
-                        System.err.println("Errore a stampare dati");
+                        //System.err.println("Errore a stampare dati");
                     }
 
                 } catch (Exception ex) {
