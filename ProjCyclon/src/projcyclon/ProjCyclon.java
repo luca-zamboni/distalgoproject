@@ -36,8 +36,8 @@ public class ProjCyclon {
         // DECOMMENTARE QUANDO CONSEGNAMO
         try {
             String sNPeer = JOptionPane.showInputDialog("Number of Peers?");
-            String snei = JOptionPane.showInputDialog("Neighboars");
-            String sscamb = JOptionPane.showInputDialog("Changed?");
+            String snei = JOptionPane.showInputDialog("Number of neighbors?");
+            String sscamb = JOptionPane.showInputDialog("Number of exchanged peers?");
             NPeer = Integer.parseInt(sNPeer);
             nei = Integer.parseInt(snei);
             scamb = Integer.parseInt(sscamb);
